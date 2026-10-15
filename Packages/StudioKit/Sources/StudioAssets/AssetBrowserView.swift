@@ -11,7 +11,7 @@ public struct AssetBrowserView: View {
     @State private var favoritesOnly = false
     @State private var tag: String?
     @State private var selected: Asset.ID?
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
     @State private var message: String?
     @State private var confirmDelete = false
     @State private var newTag = ""
@@ -56,10 +56,9 @@ public struct AssetBrowserView: View {
         .navigationTitle("Libreria asset")
         .searchable(text: $query, prompt: "Nome, tag o metadati")
         .toolbar {
-            Button { importing = true } label: { Label("Importa", systemImage: "plus") }
+            ImportMenu("Importa", systemImage: "plus", request: $importRequest, library: [.images, .videos], camera: [.images, .videos])
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.item], allowsMultipleSelection: true) { r in
-            guard case .success(let urls) = r else { return }
+        .mediaImporter($importRequest, types: [.item], library: [.images, .videos], camera: [.images, .videos], multiple: true) { urls in
             Task {
                 do {
                     let res = try await catalog.importFiles(urls)

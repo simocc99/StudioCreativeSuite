@@ -94,7 +94,7 @@ extension Array {
 
 public struct LayoutEditorView: View {
     @State private var model: LayoutEditorModel
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
     @State private var dragStart: CGRect?
 
     public init(project: ProjectController<LayoutProject>) {
@@ -120,13 +120,13 @@ public struct LayoutEditorView: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button { model.addTextFrame() } label: { Label("Testo", systemImage: "text.alignleft") }
-                Button { importing = true } label: { Label("Immagine", systemImage: "photo") }
+                ImportMenu("Immagine", systemImage: "photo", request: $importRequest, library: .images, camera: .images)
                 Button { model.addRectangle() } label: { Label("Forma", systemImage: "rectangle.fill") }
                 Button { model.exportPDF() } label: { Label("Esporta PDF", systemImage: "square.and.arrow.up") }
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.image]) { r in
-            if case .success(let url) = r { model.addImage(url) }
+        .mediaImporter($importRequest, types: [.image], library: .images, camera: .images, multiple: true) { urls in
+            for url in urls { model.addImage(url) }
         }
         .shareSheet($model.exported)
         .overlay(alignment: .top) { if let e = model.error { ErrorBanner(e) { model.error = nil } } }

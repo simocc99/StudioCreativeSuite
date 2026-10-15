@@ -222,7 +222,7 @@ extension Array {
 
 public struct VectorEditorView: View {
     @State private var model: VectorEditorModel
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
     @State private var dragStart: CGPoint?
     @State private var dragLast: CGPoint?
     @State private var nodeDrag: (UUID, Int, Int)? // shape, node, part (0 point, 1 in, 2 out)
@@ -255,14 +255,14 @@ public struct VectorEditorView: View {
         .undoRedoToolbar(canUndo: model.project.canUndo, canRedo: model.project.canRedo, undo: { model.project.undo() }, redo: { model.project.redo() })
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button { importing = true } label: { Label("Importa SVG", systemImage: "square.and.arrow.down") }
+                ImportMenu("Importa SVG", systemImage: "square.and.arrow.down", request: $importRequest, library: .none)
                 Menu {
                     ForEach(VectorEditorModel.ExportKind.allCases) { k in Button(k.title) { model.export(k) } }
                 } label: { Label("Esporta", systemImage: "square.and.arrow.up") }
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.svg]) { r in
-            if case .success(let url) = r { model.importSVG(url) }
+        .mediaImporter($importRequest, types: [.svg], library: .none) { urls in
+            if let url = urls.first { model.importSVG(url) }
         }
         .shareSheet($model.exported)
         .overlay(alignment: .top) { if let e = model.error { ErrorBanner(e) { model.error = nil } } }

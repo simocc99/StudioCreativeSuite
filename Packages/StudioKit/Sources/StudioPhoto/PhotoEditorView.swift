@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 
 public struct PhotoEditorView: View {
     @State private var model: PhotoEditorModel
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
     @State private var showExport = false
     @State private var zoom: CGFloat = 1
     @State private var zoomBase: CGFloat = 1
@@ -32,7 +32,7 @@ public struct PhotoEditorView: View {
         .undoRedoToolbar(canUndo: model.project.canUndo, canRedo: model.project.canRedo, undo: model.undo, redo: model.redo)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button { importing = true } label: { Label("Importa foto", systemImage: "square.and.arrow.down") }
+                ImportMenu("Importa foto", systemImage: "square.and.arrow.down", request: $importRequest, library: .images, camera: .images)
                 if model.engine != nil {
                     Toggle(isOn: $model.showBefore) { Label("Prima/dopo", systemImage: "rectangle.split.2x1") }
                         .keyboardShortcut("\\", modifiers: [])
@@ -41,8 +41,8 @@ public struct PhotoEditorView: View {
                 }
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: Self.importTypes) { r in
-            if case .success(let url) = r { Task { await model.importSource(url) } }
+        .mediaImporter($importRequest, types: Self.importTypes, library: .images, camera: .images) { urls in
+            if let url = urls.first { Task { await model.importSource(url) } }
         }
         .sheet(isPresented: $showExport) { PhotoExportSheet(model: model) }
         .shareSheet($model.exported)
@@ -84,9 +84,10 @@ public struct PhotoEditorView: View {
                     ContentUnavailableView {
                         Label("Nessuna foto", systemImage: "camera.aperture")
                     } description: {
-                        Text("Importa un RAW (DNG, CR2, CR3, NEF, ARW, RAF, RW2…) o un'immagine JPEG, PNG, TIFF, HEIC. L'originale viene copiato nel progetto e non viene mai modificato.")
+                        Text("Scegli una foto dalla libreria Foto o da File, scattala con la fotocamera, incollala o trascinala qui. RAW (DNG, CR2, CR3, NEF, ARW, RAF, RW2…) e ProRAW arrivano come originali; anche JPEG, PNG, TIFF e HEIC. L'originale viene copiato nel progetto e non viene mai modificato.")
                     } actions: {
-                        Button("Importa foto") { importing = true }.buttonStyle(.borderedProminent)
+                        Menu { ImportMenuItems(request: $importRequest, library: .images, camera: .images) } label: { Label("Importa foto", systemImage: "plus") }
+                            .buttonStyle(.borderedProminent)
                     }
                 }
                 if model.showBefore {

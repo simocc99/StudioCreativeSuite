@@ -343,7 +343,7 @@ final class RasterEditorModel {
 
 public struct RasterEditorView: View {
     @State private var model: RasterEditorModel
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
     @State private var selStart: CGPoint?
     @State private var moveStart: (Double, Double)?
 
@@ -362,7 +362,7 @@ public struct RasterEditorView: View {
         .undoRedoToolbar(canUndo: model.canUndo, canRedo: model.canRedo, undo: model.undo, redo: model.redo)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button { importing = true } label: { Label("Importa immagine", systemImage: "photo.badge.plus") }
+                ImportMenu("Importa immagine", systemImage: "photo.badge.plus", request: $importRequest, library: .images, camera: .images)
                 Menu {
                     Button("PNG") { model.export(.png) }
                     Button("JPEG") { model.export(.jpeg) }
@@ -370,8 +370,8 @@ public struct RasterEditorView: View {
                 } label: { Label("Esporta", systemImage: "square.and.arrow.up") }
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.image]) { r in
-            if case .success(let u) = r { model.importImage(u) }
+        .mediaImporter($importRequest, types: [.image], library: .images, camera: .images) { urls in
+            if let u = urls.first { model.importImage(u) }
         }
         .shareSheet($model.exported)
         .overlay(alignment: .top) { if let e = model.error { ErrorBanner(e) { model.error = nil } } }

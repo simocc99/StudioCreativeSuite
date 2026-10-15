@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 
 public struct AudioEditorView: View {
     @State private var model: AudioEditorModel
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
     @State private var showExport = false
 
     public init(project: ProjectController<AudioProject>) {
@@ -24,12 +24,13 @@ public struct AudioEditorView: View {
         .undoRedoToolbar(canUndo: model.project.canUndo, canRedo: model.project.canRedo, undo: model.undo, redo: model.redo)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button { importing = true } label: { Label("Importa audio", systemImage: "square.and.arrow.down") }
+                ImportMenu("Importa audio", systemImage: "square.and.arrow.down", request: $importRequest, library: .videos)
                 Button { showExport = true } label: { Label("Esporta", systemImage: "square.and.arrow.up") }.disabled(model.doc.duration <= 0)
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.audio], allowsMultipleSelection: true) { r in
-            if case .success(let urls) = r { Task { await model.importFiles(urls) } }
+        // audio files as they are; videos (Photos library or Files) contribute their audio track
+        .mediaImporter($importRequest, types: [.audio, .movie], library: .videos, multiple: true, audioFromVideo: true) { urls in
+            Task { await model.importFiles(urls) }
         }
         .sheet(isPresented: $showExport) { AudioExportSheet(model: model) }
         .shareSheet($model.exported)

@@ -155,7 +155,7 @@ final class MotionEditorModel {
 
 public struct MotionEditorView: View {
     @State private var model: MotionEditorModel
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
 
     public init(project: ProjectController<MotionProject>) {
         _model = State(initialValue: MotionEditorModel(project: project))
@@ -181,15 +181,15 @@ public struct MotionEditorView: View {
                     Button("Stella") { model.addLayer(.star(points: 5), name: "Stella") }
                     Button("Testo") { model.addLayer(.text("Titolo animato", fontSize: 120), name: "Testo") }
                     Button("Tinta unita") { model.addLayer(.solid, name: "Tinta unita") }
-                    Button("Immagine…") { importing = true }
+                    Menu { ImportMenuItems(request: $importRequest, library: .images, camera: .images) } label: { Label("Immagine", systemImage: "photo") }
                 } label: { Label("Livello", systemImage: "plus.square.on.square") }
                 Menu {
                     ForEach(MotionEditorModel.ExportKind.allCases) { k in Button(k.title) { model.export(k) } }
                 } label: { Label("Renderizza", systemImage: "square.and.arrow.up") }
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.image]) { r in
-            if case .success(let url) = r { model.importImage(url) }
+        .mediaImporter($importRequest, types: [.image], library: .images, camera: .images, multiple: true) { urls in
+            for url in urls { model.importImage(url) }
         }
         .shareSheet($model.exported)
         .overlay(alignment: .top) { if let e = model.error { ErrorBanner(e) { model.error = nil } } }

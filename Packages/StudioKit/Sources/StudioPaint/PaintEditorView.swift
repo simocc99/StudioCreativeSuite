@@ -198,7 +198,7 @@ final class PaintEditorModel {
 
 public struct PaintEditorView: View {
     @State private var model: PaintEditorModel
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
 
     public init(project: ProjectController<PaintProject>) {
         _model = State(initialValue: PaintEditorModel(project: project))
@@ -221,15 +221,15 @@ public struct PaintEditorView: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Toggle(isOn: $model.pencilOnly) { Label("Solo Pencil", systemImage: "applepencil") }
-                Button { importing = true } label: { Label("Importa immagine", systemImage: "photo.badge.plus") }
+                ImportMenu("Importa immagine", systemImage: "photo.badge.plus", request: $importRequest, library: .images, camera: .images)
                 Menu {
                     Button("PNG") { model.export(.png) }
                     Button("JPEG") { model.export(.jpeg) }
                 } label: { Label("Esporta", systemImage: "square.and.arrow.up") }
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.image]) { r in
-            if case .success(let url) = r { model.importImage(url) }
+        .mediaImporter($importRequest, types: [.image], library: .images, camera: .images) { urls in
+            if let url = urls.first { model.importImage(url) }
         }
         .shareSheet($model.exported)
         .overlay(alignment: .top) { if let e = model.error { ErrorBanner(e) { model.error = nil } } }

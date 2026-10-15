@@ -272,7 +272,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Studio;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Studio usa il microfono solo quando avvii una registrazione nell'editor audio.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Studio usa la fotocamera solo quando scegli Fotocamera per scattare una foto o registrare un video da importare.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Studio usa il microfono quando avvii una registrazione nell'editor audio o registri un video con la fotocamera.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -310,7 +311,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Studio;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Studio usa il microfono solo quando avvii una registrazione nell'editor audio.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Studio usa la fotocamera solo quando scegli Fotocamera per scattare una foto o registrare un video da importare.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Studio usa il microfono quando avvii una registrazione nell'editor audio o registri un video con la fotocamera.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

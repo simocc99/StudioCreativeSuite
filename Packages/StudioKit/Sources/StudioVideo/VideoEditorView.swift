@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 
 public struct VideoEditorView: View {
     @State private var model: VideoEditorModel
-    @State private var importing = false
+    @State private var importRequest: ImportSource?
     @State private var importingSRT = false
     @State private var showExport = false
     @State private var timelineHeight: CGFloat = 320
@@ -17,7 +17,7 @@ public struct VideoEditorView: View {
     public var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                MediaBinView(model: model, importing: $importing).studioPanel(width: 230, edge: .trailing)
+                MediaBinView(model: model, importRequest: $importRequest).studioPanel(width: 230, edge: .trailing)
                 VStack(spacing: 0) {
                     PlayerLayerView(player: model.player)
                         .aspectRatio(CGFloat(model.doc.renderWidth) / CGFloat(max(1, model.doc.renderHeight)), contentMode: .fit)
@@ -44,8 +44,8 @@ public struct VideoEditorView: View {
                     .disabled(model.doc.duration <= 0)
             }
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.movie, .audio, .mpeg4Movie, .quickTimeMovie], allowsMultipleSelection: true) { r in
-            if case .success(let urls) = r { Task { await model.importMedia(urls) } }
+        .mediaImporter($importRequest, types: [.movie, .audio, .mpeg4Movie, .quickTimeMovie], library: .videos, camera: .videos, multiple: true) { urls in
+            Task { await model.importMedia(urls) }
         }
         .fileImporter(isPresented: $importingSRT, allowedContentTypes: [UTType(filenameExtension: "srt") ?? .plainText, .plainText]) { r in
             if case .success(let url) = r { model.importSRT(url) }
@@ -151,14 +151,15 @@ struct PlayerLayerView: UIViewRepresentable {
 
 struct MediaBinView: View {
     let model: VideoEditorModel
-    @Binding var importing: Bool
+    @Binding var importRequest: ImportSource?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("Media").font(.headline)
                 Spacer()
-                Button { importing = true } label: { Image(systemName: "plus") }
+                Menu { ImportMenuItems(request: $importRequest, library: .videos, camera: .videos) } label: { Image(systemName: "plus") }
+                    .accessibilityLabel("Importa media")
             }
             .padding()
             if model.doc.media.isEmpty {
