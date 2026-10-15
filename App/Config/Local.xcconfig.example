@@ -1,0 +1,3 @@
+// Copy to Local.xcconfig (git-ignored) and fill in your own values.
+DEVELOPMENT_TEAM = YOURTEAMID
+STUDIO_BUNDLE_ID = com.yourname.studiocreativesuite

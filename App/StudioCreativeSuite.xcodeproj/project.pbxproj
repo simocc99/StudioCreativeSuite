@@ -1,0 +1,416 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5C0000000000000000000B01 /* StudioKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0000000000000000000D01 /* StudioKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		5C0000000000000000000A01 /* StudioCreativeSuite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StudioCreativeSuite.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C0000000000000000000A02 /* StudioApp.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = StudioApp.xcconfig; sourceTree = "<group>"; };
+		5C0000000000000000002A01 /* StudioCreativeSuiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StudioCreativeSuiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		5C0000000000000000000E01 /* StudioApp */ = {isa = PBXFileSystemSynchronizedRootGroup; path = StudioApp; sourceTree = "<group>"; };
+		5C0000000000000000002E01 /* StudioKitTests */ = {isa = PBXFileSystemSynchronizedRootGroup; name = StudioKitTests; path = ../Packages/StudioKit/Tests/StudioKitTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5C0000000000000000000F01 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C0000000000000000000B01 /* StudioKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C0000000000000000002F01 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5C0000000000000000000C01 = {
+			isa = PBXGroup;
+			children = (
+				5C0000000000000000000E01 /* StudioApp */,
+				5C0000000000000000002E01 /* StudioKitTests */,
+				5C0000000000000000000C03 /* Config */,
+				5C0000000000000000000C02 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5C0000000000000000000C02 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5C0000000000000000000A01 /* StudioCreativeSuite.app */,
+				5C0000000000000000002A01 /* StudioCreativeSuiteTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5C0000000000000000000C03 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				5C0000000000000000000A02 /* StudioApp.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5C0000000000000000001001 /* StudioCreativeSuite */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5C0000000000000000001202 /* Build configuration list for PBXNativeTarget "StudioCreativeSuite" */;
+			buildPhases = (
+				5C0000000000000000001101 /* Sources */,
+				5C0000000000000000000F01 /* Frameworks */,
+				5C0000000000000000001102 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5C0000000000000000000E01 /* StudioApp */,
+			);
+			name = StudioCreativeSuite;
+			packageProductDependencies = (
+				5C0000000000000000000D01 /* StudioKit */,
+			);
+			productName = StudioCreativeSuite;
+			productReference = 5C0000000000000000000A01 /* StudioCreativeSuite.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5C0000000000000000003001 /* StudioCreativeSuiteTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5C0000000000000000003202 /* Build configuration list for PBXNativeTarget "StudioCreativeSuiteTests" */;
+			buildPhases = (
+				5C0000000000000000003101 /* Sources */,
+				5C0000000000000000002F01 /* Frameworks */,
+				5C0000000000000000003102 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5C0000000000000000003401 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5C0000000000000000002E01 /* StudioKitTests */,
+			);
+			name = StudioCreativeSuiteTests;
+			productName = StudioCreativeSuiteTests;
+			productReference = 5C0000000000000000002A01 /* StudioCreativeSuiteTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5C0000000000000000001301 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					5C0000000000000000001001 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					5C0000000000000000003001 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 5C0000000000000000001001;
+					};
+				};
+			};
+			buildConfigurationList = 5C0000000000000000001201 /* Build configuration list for PBXProject "StudioCreativeSuite" */;
+			developmentRegion = it;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				it,
+				en,
+				Base,
+			);
+			mainGroup = 5C0000000000000000000C01;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5C0000000000000000001401 /* XCLocalSwiftPackageReference "../Packages/StudioKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5C0000000000000000000C02 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5C0000000000000000001001 /* StudioCreativeSuite */,
+				5C0000000000000000003001 /* StudioCreativeSuiteTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5C0000000000000000001102 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C0000000000000000003102 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5C0000000000000000001101 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C0000000000000000003101 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXContainerItemProxy section */
+		5C0000000000000000003301 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5C0000000000000000001301 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5C0000000000000000001001;
+			remoteInfo = StudioCreativeSuite;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		5C0000000000000000003401 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5C0000000000000000001001 /* StudioCreativeSuite */;
+			targetProxy = 5C0000000000000000003301 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5C0000000000000000001501 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5C0000000000000000001502 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5C0000000000000000001503 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5C0000000000000000000A02 /* StudioApp.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = Config/StudioApp.entitlements;
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Studio;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Studio usa il microfono solo quando avvii una registrazione nell'editor audio.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(STUDIO_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		5C0000000000000000001504 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5C0000000000000000000A02 /* StudioApp.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = Config/StudioApp.entitlements;
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Studio;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Studio usa il microfono solo quando avvii una registrazione nell'editor audio.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(STUDIO_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+		5C0000000000000000003501 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5C0000000000000000000A02 /* StudioApp.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(STUDIO_BUNDLE_ID).tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StudioCreativeSuite.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StudioCreativeSuite";
+			};
+			name = Debug;
+		};
+		5C0000000000000000003502 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5C0000000000000000000A02 /* StudioApp.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(STUDIO_BUNDLE_ID).tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StudioCreativeSuite.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StudioCreativeSuite";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5C0000000000000000001201 /* Build configuration list for PBXProject "StudioCreativeSuite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C0000000000000000001501 /* Debug */,
+				5C0000000000000000001502 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5C0000000000000000001202 /* Build configuration list for PBXNativeTarget "StudioCreativeSuite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C0000000000000000001503 /* Debug */,
+				5C0000000000000000001504 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5C0000000000000000003202 /* Build configuration list for PBXNativeTarget "StudioCreativeSuiteTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C0000000000000000003501 /* Debug */,
+				5C0000000000000000003502 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		5C0000000000000000001401 /* XCLocalSwiftPackageReference "../Packages/StudioKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/StudioKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5C0000000000000000000D01 /* StudioKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = StudioKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 5C0000000000000000001301 /* Project object */;
+}

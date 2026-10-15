@@ -1,0 +1,4 @@
+module StudioPhotoEngineFFI {
+    header "StudioPhotoEngine.h"
+    export *
+}

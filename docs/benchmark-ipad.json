@@ -1,0 +1,336 @@
+{
+  "date" : "2026-10-14T21:47:09Z",
+  "device" : "iPad",
+  "physicalMemoryGB" : 11.175003051757812,
+  "results" : [
+    {
+      "ms" : 210.19999999999999,
+      "name" : "raw.open Apple_iPhone_2012_20Pro_IMG_1361.DNG",
+      "note" : "DNG anteprima 1800×2400",
+      "ok" : true,
+      "peakMB" : 641,
+      "startMB" : 12
+    },
+    {
+      "ms" : 257.89999999999998,
+      "name" : "raw.render10 Apple_iPhone_2012_20Pro_IMG_1361.DNG",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 798,
+      "startMB" : 641
+    },
+    {
+      "ms" : 358.69999999999999,
+      "name" : "raw.exportFullAdaptive Apple_iPhone_2012_20Pro_IMG_1361.DNG",
+      "note" : "JPEG 3024×4032 pipeline completa",
+      "ok" : true,
+      "peakMB" : 2383,
+      "startMB" : 798
+    },
+    {
+      "ms" : 339.30000000000001,
+      "name" : "raw.exportFullTiled Apple_iPhone_2012_20Pro_IMG_1361.DNG",
+      "note" : "render 3024×4032",
+      "ok" : true,
+      "peakMB" : 2248,
+      "startMB" : 2248
+    },
+    {
+      "ms" : 289,
+      "name" : "raw.open Canon_Canon_20EOS_20R10_IMG_6310.CR3",
+      "note" : "CR3 anteprima 2400×1600",
+      "ok" : true,
+      "peakMB" : 824,
+      "startMB" : 741
+    },
+    {
+      "ms" : 423.39999999999998,
+      "name" : "raw.render10 Canon_Canon_20EOS_20R10_IMG_6310.CR3",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 834,
+      "startMB" : 749
+    },
+    {
+      "ms" : 1017.6,
+      "name" : "raw.exportFullAdaptive Canon_Canon_20EOS_20R10_IMG_6310.CR3",
+      "note" : "JPEG 6000×4000 pipeline completa",
+      "ok" : true,
+      "peakMB" : 3947,
+      "startMB" : 754
+    },
+    {
+      "ms" : 1093.5,
+      "name" : "raw.exportFullTiled Canon_Canon_20EOS_20R10_IMG_6310.CR3",
+      "note" : "render 6000×4000",
+      "ok" : true,
+      "peakMB" : 1876,
+      "startMB" : 1774
+    },
+    {
+      "ms" : 263.10000000000002,
+      "name" : "raw.open Canon_EOS_205D_20Mark_20III_5G4A9394.CR2",
+      "note" : "CR2 anteprima 2400×1600",
+      "ok" : true,
+      "peakMB" : 1058,
+      "startMB" : 1039
+    },
+    {
+      "ms" : 442.19999999999999,
+      "name" : "raw.render10 Canon_EOS_205D_20Mark_20III_5G4A9394.CR2",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 1172,
+      "startMB" : 1058
+    },
+    {
+      "ms" : 825.20000000000005,
+      "name" : "raw.exportFullAdaptive Canon_EOS_205D_20Mark_20III_5G4A9394.CR2",
+      "note" : "JPEG 5760×3840 pipeline completa",
+      "ok" : true,
+      "peakMB" : 3709,
+      "startMB" : 1062
+    },
+    {
+      "ms" : 968.79999999999995,
+      "name" : "raw.exportFullTiled Canon_EOS_205D_20Mark_20III_5G4A9394.CR2",
+      "note" : "render 5760×3840",
+      "ok" : true,
+      "peakMB" : 3696,
+      "startMB" : 3696
+    },
+    {
+      "ms" : 86.299999999999997,
+      "name" : "raw.open Fujifilm_X-E3_DSCF2175.RAF",
+      "note" : "RAF anteprima 2000×1333",
+      "ok" : true,
+      "peakMB" : 835,
+      "startMB" : 835
+    },
+    {
+      "ms" : 449,
+      "name" : "raw.render10 Fujifilm_X-E3_DSCF2175.RAF",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 954,
+      "startMB" : 835
+    },
+    {
+      "ms" : 634.60000000000002,
+      "name" : "raw.exportFullAdaptive Fujifilm_X-E3_DSCF2175.RAF",
+      "note" : "JPEG 6000×4000 pipeline completa",
+      "ok" : true,
+      "peakMB" : 4146,
+      "startMB" : 954
+    },
+    {
+      "ms" : 879.39999999999998,
+      "name" : "raw.exportFullTiled Fujifilm_X-E3_DSCF2175.RAF",
+      "note" : "render 6000×4000",
+      "ok" : true,
+      "peakMB" : 1622,
+      "startMB" : 1581
+    },
+    {
+      "ms" : 367.30000000000001,
+      "name" : "raw.open Google_Pixel_204a_PXL_20201121_100251397.dng",
+      "note" : "DNG anteprima 2400×1798",
+      "ok" : true,
+      "peakMB" : 897,
+      "startMB" : 897
+    },
+    {
+      "ms" : 474.10000000000002,
+      "name" : "raw.render10 Google_Pixel_204a_PXL_20201121_100251397.dng",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 1099,
+      "startMB" : 864
+    },
+    {
+      "ms" : 496.39999999999998,
+      "name" : "raw.exportFullAdaptive Google_Pixel_204a_PXL_20201121_100251397.dng",
+      "note" : "JPEG 4016×3008 pipeline completa",
+      "ok" : true,
+      "peakMB" : 2282,
+      "startMB" : 1099
+    },
+    {
+      "ms" : 594.20000000000005,
+      "name" : "raw.exportFullTiled Google_Pixel_204a_PXL_20201121_100251397.dng",
+      "note" : "render 4016×3008",
+      "ok" : true,
+      "peakMB" : 1317,
+      "startMB" : 1284
+    },
+    {
+      "ms" : 259.69999999999999,
+      "name" : "raw.open Leica_M10_f5381888.dng",
+      "note" : "DNG anteprima 2400×1600",
+      "ok" : true,
+      "peakMB" : 824,
+      "startMB" : 799
+    },
+    {
+      "ms" : 397.60000000000002,
+      "name" : "raw.render10 Leica_M10_f5381888.dng",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 957,
+      "startMB" : 824
+    },
+    {
+      "ms" : 853,
+      "name" : "raw.exportFullAdaptive Leica_M10_f5381888.dng",
+      "note" : "JPEG 5976×3984 pipeline completa",
+      "ok" : true,
+      "peakMB" : 3876,
+      "startMB" : 919
+    },
+    {
+      "ms" : 985.29999999999995,
+      "name" : "raw.exportFullTiled Leica_M10_f5381888.dng",
+      "note" : "render 5976×3984",
+      "ok" : true,
+      "peakMB" : 3858,
+      "startMB" : 3858
+    },
+    {
+      "ms" : 208.19999999999999,
+      "name" : "raw.open Nikon_D750_compressed_12_bit.NEF",
+      "note" : "NEF anteprima 2400×1604",
+      "ok" : true,
+      "peakMB" : 783,
+      "startMB" : 783
+    },
+    {
+      "ms" : 448.30000000000001,
+      "name" : "raw.render10 Nikon_D750_compressed_12_bit.NEF",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 944,
+      "startMB" : 749
+    },
+    {
+      "ms" : 796.5,
+      "name" : "raw.exportFullAdaptive Nikon_D750_compressed_12_bit.NEF",
+      "note" : "JPEG 6032×4032 pipeline completa",
+      "ok" : true,
+      "peakMB" : 3992,
+      "startMB" : 836
+    },
+    {
+      "ms" : 955.5,
+      "name" : "raw.exportFullTiled Nikon_D750_compressed_12_bit.NEF",
+      "note" : "render 6032×4032",
+      "ok" : true,
+      "peakMB" : 1652,
+      "startMB" : 1597
+    },
+    {
+      "ms" : 276.69999999999999,
+      "name" : "raw.open Panasonic_DC-G9_P1000475.RW2",
+      "note" : "RW2 anteprima 2400×1800",
+      "ok" : true,
+      "peakMB" : 977,
+      "startMB" : 774
+    },
+    {
+      "ms" : 499.10000000000002,
+      "name" : "raw.render10 Panasonic_DC-G9_P1000475.RW2",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 1105,
+      "startMB" : 977
+    },
+    {
+      "ms" : 3993.8000000000002,
+      "name" : "raw.exportFullAdaptive Panasonic_DC-G9_P1000475.RW2",
+      "note" : "JPEG 10368×7776 a tasselli",
+      "ok" : true,
+      "peakMB" : 2850,
+      "startMB" : 1105
+    },
+    {
+      "ms" : 3629.6999999999998,
+      "name" : "raw.exportFullTiled Panasonic_DC-G9_P1000475.RW2",
+      "note" : "render 10368×7776",
+      "ok" : true,
+      "peakMB" : 2279,
+      "startMB" : 1785
+    },
+    {
+      "ms" : 160.30000000000001,
+      "name" : "raw.open Sony_ILCE-7M3_UNCOMPRESSED_14bit.ARW",
+      "note" : "ARW anteprima 2400×1600",
+      "ok" : true,
+      "peakMB" : 1756,
+      "startMB" : 1712
+    },
+    {
+      "ms" : 467.69999999999999,
+      "name" : "raw.render10 Sony_ILCE-7M3_UNCOMPRESSED_14bit.ARW",
+      "note" : "10 render draft",
+      "ok" : true,
+      "peakMB" : 1889,
+      "startMB" : 1756
+    },
+    {
+      "ms" : 885.89999999999998,
+      "name" : "raw.exportFullAdaptive Sony_ILCE-7M3_UNCOMPRESSED_14bit.ARW",
+      "note" : "JPEG 6000×4000 pipeline completa",
+      "ok" : true,
+      "peakMB" : 3847,
+      "startMB" : 1437
+    },
+    {
+      "ms" : 992.29999999999995,
+      "name" : "raw.exportFullTiled Sony_ILCE-7M3_UNCOMPRESSED_14bit.ARW",
+      "note" : "render 6000×4000",
+      "ok" : true,
+      "peakMB" : 3943,
+      "startMB" : 3847
+    },
+    {
+      "ms" : 2297.5,
+      "name" : "video.makeClips",
+      "note" : "2 × 10 s 1080p H.264 (AVAssetWriter)",
+      "ok" : true,
+      "peakMB" : 948,
+      "startMB" : 900
+    },
+    {
+      "ms" : 2253.5,
+      "name" : "video.exportHEVC1080",
+      "note" : "HEVC 1080p (.mov), 19.0 s",
+      "ok" : true,
+      "peakMB" : 369,
+      "startMB" : 350
+    },
+    {
+      "ms" : 242.90000000000001,
+      "name" : "audio.mix4x60s",
+      "note" : "60 s stereo, picco 1.8 dBFS",
+      "ok" : true,
+      "peakMB" : 160,
+      "startMB" : 114
+    },
+    {
+      "ms" : 28.699999999999999,
+      "name" : "raster.compose6000x4000",
+      "note" : "6000×4000",
+      "ok" : true,
+      "peakMB" : 161,
+      "startMB" : 160
+    },
+    {
+      "ms" : 80.599999999999994,
+      "name" : "paint.stroke2000",
+      "note" : "2000 campioni, pennello 60 px",
+      "ok" : true,
+      "peakMB" : 181,
+      "startMB" : 161
+    }
+  ],
+  "system" : "iPadOS 27.0"
+}

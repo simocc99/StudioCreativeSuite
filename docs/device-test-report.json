@@ -1,0 +1,392 @@
+[
+  {
+    "expected" : "clipped samples counted",
+    "observed" : "60400",
+    "result" : "PASS",
+    "test" : "audio.clipping"
+  },
+  {
+    "expected" : "signal under threshold attenuated ~40 dB (−54 → ≈−94 dBFS)",
+    "observed" : "-85.9 dBFS",
+    "result" : "PASS",
+    "test" : "audio.gate"
+  },
+  {
+    "expected" : "10 kHz attenuated > 20 dB by a 1 kHz low-pass",
+    "observed" : "-42.7 dB",
+    "result" : "PASS",
+    "test" : "audio.lowpass"
+  },
+  {
+    "expected" : "2.00 s",
+    "observed" : "2.000 s",
+    "result" : "PASS",
+    "test" : "audio.mix.length"
+  },
+  {
+    "expected" : "left louder than right",
+    "observed" : "L 0.4898988 R 0.2828427",
+    "result" : "PASS",
+    "test" : "audio.pan"
+  },
+  {
+    "expected" : "readable 2 s file",
+    "observed" : "2.000 s, peak 0.94",
+    "result" : "PASS",
+    "test" : "audio.export.wav16"
+  },
+  {
+    "expected" : "readable 2 s file",
+    "observed" : "2.000 s, peak 0.94",
+    "result" : "PASS",
+    "test" : "audio.export.wav24"
+  },
+  {
+    "expected" : "readable 2 s file",
+    "observed" : "2.000 s, peak 0.94",
+    "result" : "PASS",
+    "test" : "audio.export.aiff"
+  },
+  {
+    "expected" : "readable 2 s file",
+    "observed" : "2.000 s, peak 0.94",
+    "result" : "PASS",
+    "test" : "audio.export.m4a"
+  },
+  {
+    "expected" : "readable 2 s file",
+    "observed" : "2.000 s, peak 0.94",
+    "result" : "PASS",
+    "test" : "audio.export.caf"
+  },
+  {
+    "expected" : "-1.00 dBFS",
+    "observed" : "-1.00 dBFS",
+    "result" : "PASS",
+    "test" : "audio.normalize"
+  },
+  {
+    "expected" : "silent at both ends",
+    "observed" : "0.0 … -0.0",
+    "result" : "PASS",
+    "test" : "audio.fade"
+  },
+  {
+    "expected" : "≈ +6 dB at 60 Hz",
+    "observed" : "5.62 dB",
+    "result" : "PASS",
+    "test" : "audio.lowshelf"
+  },
+  {
+    "expected" : "encode + decode",
+    "observed" : "encode=true decode=true fourcc=avc1",
+    "result" : "PASS",
+    "test" : "codec.h264.dispositivo"
+  },
+  {
+    "expected" : "osservazione",
+    "observed" : "encode=true decode=true fourcc=hvc1",
+    "result" : "PASS",
+    "test" : "codec.hevc.dispositivo"
+  },
+  {
+    "expected" : "osservazione",
+    "observed" : "encode=true decode=true fourcc=apcn",
+    "result" : "PASS",
+    "test" : "codec.prores.dispositivo"
+  },
+  {
+    "expected" : "two distinct copies, original kept",
+    "observed" : "Media\/a.png, Media\/a-2.png",
+    "result" : "PASS",
+    "test" : "media.unique"
+  },
+  {
+    "expected" : "set\/get nested keeps siblings",
+    "observed" : "{\"light\":{\"contrast\":10,\"exposure\":0.5},\"new\":{\"deep\":{\"key\":\"a\"}},\"version\":1}",
+    "result" : "PASS",
+    "test" : "json.path"
+  },
+  {
+    "expected" : "\"version\":1",
+    "observed" : "{\"light\":{\"contrast\":10,\"exposure\":0.5},\"new\":{\"deep\":{\"key\":\"a\"}},\"version\":1}",
+    "result" : "PASS",
+    "test" : "json.int"
+  },
+  {
+    "expected" : "salvato",
+    "observed" : "salvato",
+    "result" : "PASS",
+    "test" : "project.roundtrip"
+  },
+  {
+    "expected" : "count 42, v2",
+    "observed" : "count 42, v2",
+    "result" : "PASS",
+    "test" : "project.migration"
+  },
+  {
+    "expected" : "newerFormat error",
+    "observed" : "newerFormat(kind: \"layout\", found: 99, supported: 2)",
+    "result" : "PASS",
+    "test" : "project.newer"
+  },
+  {
+    "expected" : "a drag is one undo step",
+    "observed" : "2 steps",
+    "result" : "PASS",
+    "test" : "undo.coalesce"
+  },
+  {
+    "expected" : "2 stored, 1 duplicate",
+    "observed" : "2 added, 1 duplicates",
+    "result" : "PASS",
+    "test" : "assets.dedup"
+  },
+  {
+    "expected" : "3 pages, text searchable",
+    "observed" : "3 pages, 1 hits",
+    "result" : "PASS",
+    "test" : "layout.pdf"
+  },
+  {
+    "expected" : "overflow detected",
+    "observed" : "true",
+    "result" : "PASS",
+    "test" : "layout.overflow"
+  },
+  {
+    "expected" : "page 3 first",
+    "observed" : "Pagina numero 3 parola3\n3",
+    "result" : "PASS",
+    "test" : "pdf.reorder"
+  },
+  {
+    "expected" : "5 pages, ≥3 annotations, rotation kept",
+    "observed" : "5 pages, 4 annotations, rot 90",
+    "result" : "PASS",
+    "test" : "pdf.save"
+  },
+  {
+    "expected" : "50 at t=1",
+    "observed" : "50.0",
+    "result" : "PASS",
+    "test" : "motion.linear"
+  },
+  {
+    "expected" : "box moves left → right",
+    "observed" : "255 \/ 255",
+    "result" : "PASS",
+    "test" : "motion.render"
+  },
+  {
+    "expected" : "1 s movie",
+    "observed" : "1.000 s",
+    "result" : "PASS",
+    "test" : "motion.export"
+  },
+  {
+    "expected" : "blue along the stroke, transparent elsewhere",
+    "observed" : "mid Optional(StudioCore.RGBAColor(r: 0.0, g: 0.0, b: 1.0, a: 1.0)) off Optional(StudioCore.RGBAColor(r: 0.0, g: 0.0, b: 0.0, a: 0.0))",
+    "result" : "PASS",
+    "test" : "paint.stroke"
+  },
+  {
+    "expected" : "erased to transparent",
+    "observed" : "0.0",
+    "result" : "PASS",
+    "test" : "paint.erase"
+  },
+  {
+    "expected" : "pixels survive save + reopen",
+    "observed" : "Optional(StudioCore.RGBAColor(r: 0.0, g: 0.0, b: 1.0, a: 1.0))",
+    "result" : "PASS",
+    "test" : "paint.persist"
+  },
+  {
+    "expected" : "error, no crash",
+    "observed" : "Errore del motore: unrecognised image format",
+    "result" : "PASS",
+    "test" : "photo.corrupt"
+  },
+  {
+    "expected" : "neutral grey",
+    "observed" : "90\/90\/90",
+    "result" : "PASS",
+    "test" : "photo.preset.bw"
+  },
+  {
+    "expected" : "red × white = red",
+    "observed" : "255,0,0",
+    "result" : "PASS",
+    "test" : "raster.multiply"
+  },
+  {
+    "expected" : "50% red over white ≈ (255,128,128)",
+    "observed" : "255,128,128",
+    "result" : "PASS",
+    "test" : "raster.opacity"
+  },
+  {
+    "expected" : "inverted red = cyan",
+    "observed" : "0,255,255",
+    "result" : "PASS",
+    "test" : "raster.filter.invert"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=DNG export=1536x2048 mean=67,73,82 top=105",
+    "result" : "PASS",
+    "test" : "raw.DNG.Apple_iPhone_2012_20Pro_IMG_1361.DNG"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=NEF export=2048x1369 mean=61,24,26 top=57",
+    "result" : "PASS",
+    "test" : "raw.NEF.Nikon_D750_compressed_12_bit.NEF"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=CR2 export=2048x1365 mean=141,109,76 top=124",
+    "result" : "PASS",
+    "test" : "raw.CR2.Canon_EOS_205D_20Mark_20III_5G4A9394.CR2"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=RW2 export=2048x1536 mean=65,91,57 top=77",
+    "result" : "PASS",
+    "test" : "raw.RW2.Panasonic_DC-G9_P1000475.RW2"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=CR3 export=2048x1365 mean=186,178,155 top=186",
+    "result" : "PASS",
+    "test" : "raw.CR3.Canon_Canon_20EOS_20R10_IMG_6310.CR3"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=DNG export=2048x1365 mean=111,99,85 top=120",
+    "result" : "PASS",
+    "test" : "raw.DNG.Leica_M10_f5381888.dng"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=RAF export=2048x1365 mean=158,122,119 top=169",
+    "result" : "PASS",
+    "test" : "raw.RAF.Fujifilm_X-E3_DSCF2175.RAF"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=ARW export=2048x1365 mean=124,125,117 top=169",
+    "result" : "PASS",
+    "test" : "raw.ARW.Sony_ILCE-7M3_UNCOMPRESSED_14bit.ARW"
+  },
+  {
+    "expected" : "raw decode from sensor data + export 2048 px",
+    "observed" : "isRaw=true format=DNG export=2048x1534 mean=95,90,84 top=140",
+    "result" : "PASS",
+    "test" : "raw.DNG.Google_Pixel_204a_PXL_20201121_100251397.dng"
+  },
+  {
+    "expected" : "PNG opened as rendered image",
+    "observed" : "isRaw=false",
+    "result" : "PASS",
+    "test" : "photo.rendered.notRaw"
+  },
+  {
+    "expected" : "+1 EV brightens the render",
+    "observed" : "102.0 → 141.0",
+    "result" : "PASS",
+    "test" : "photo.exposure"
+  },
+  {
+    "expected" : "600 px wide JPEG",
+    "observed" : "600",
+    "result" : "PASS",
+    "test" : "photo.export.jpg"
+  },
+  {
+    "expected" : "00:01:00, 01:01:15",
+    "observed" : "00:01:00, 01:01:15",
+    "result" : "PASS",
+    "test" : "video.timecode"
+  },
+  {
+    "expected" : "union 90×90, intersection 30×30",
+    "observed" : "(0.0, 0.0, 90.0, 90.0) \/ (30.0, 30.0, 30.0, 30.0)",
+    "result" : "PASS",
+    "test" : "vector.boolean"
+  },
+  {
+    "expected" : "800 px wide, red rect",
+    "observed" : "800 px, 255,0",
+    "result" : "PASS",
+    "test" : "vector.png"
+  },
+  {
+    "expected" : "rect 10,10 50×30; unknown element reported",
+    "observed" : "(10.0, 10.0, 50.0, 30.0) [\"foo\": 1]",
+    "result" : "PASS",
+    "test" : "vector.svg.relative"
+  },
+  {
+    "expected" : "3 shapes, white background, 200 wide",
+    "observed" : "3 shapes, 200.0 wide, skipped [:]",
+    "result" : "PASS",
+    "test" : "vector.svg.roundtrip"
+  },
+  {
+    "expected" : "H.264 available",
+    "observed" : "h264_1080,h264_720,hevc_1080,hevc_2160,prores422,audioM4A",
+    "result" : "PASS",
+    "test" : "video.presets"
+  },
+  {
+    "expected" : "3.5 s with video + audio tracks",
+    "observed" : "3.50 s, 1 video, 1 audio",
+    "result" : "PASS",
+    "test" : "video.export.duration"
+  },
+  {
+    "expected" : "red at 1.2 s, blue at 3.0 s",
+    "observed" : "237,0,1 \/ 1,0,245",
+    "result" : "PASS",
+    "test" : "video.export.frames"
+  },
+  {
+    "expected" : "red and blue mixed at 1.75 s",
+    "observed" : "137,125",
+    "result" : "PASS",
+    "test" : "video.export.dissolve"
+  },
+  {
+    "expected" : "identical project after reopen",
+    "observed" : "identical",
+    "result" : "PASS",
+    "test" : "video.reopen"
+  },
+  {
+    "expected" : "1.5 s + 2.5 s from 1.5 s",
+    "observed" : "1.5, src 1.5",
+    "result" : "PASS",
+    "test" : "video.split"
+  },
+  {
+    "expected" : "b moves to 1.5 s",
+    "observed" : "1.5",
+    "result" : "PASS",
+    "test" : "video.ripple"
+  },
+  {
+    "expected" : "trim limited to source, no overlap",
+    "observed" : "dur 4.0 b@4.0",
+    "result" : "PASS",
+    "test" : "video.trim.bound"
+  },
+  {
+    "expected" : "clips never overlap",
+    "observed" : "0.0-4.0 4.0-5.5",
+    "result" : "PASS",
+    "test" : "video.move.noOverlap"
+  }
+]

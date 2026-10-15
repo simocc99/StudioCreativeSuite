@@ -1,0 +1,10 @@
+// Shared build settings for the Studio app target. No secrets here.
+// Signing: create App/Config/Local.xcconfig (git-ignored) with, for example:
+//   DEVELOPMENT_TEAM = ABCDE12345
+//   STUDIO_BUNDLE_ID = com.yourname.studiocreativesuite
+// A free Apple Account needs a bundle identifier that nobody else has registered.
+
+STUDIO_BUNDLE_ID = com.example.studiocreativesuite
+DEVELOPMENT_TEAM =
+
+#include? "Local.xcconfig"

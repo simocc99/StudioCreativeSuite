@@ -1,0 +1,27 @@
+[package]
+name = "studio-photo-engine"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "C ABI bridge between Studio Creative Suite (Swift) and the LightCraft photo engine"
+publish = false
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+# LightCraft, pinned to the commit analysed in ENGINE_SELECTION.md (MIT OR Apache-2.0).
+lightcraft-engine = { git = "https://github.com/storytold/lightcraft", rev = "3b4279fc2485bb51847c0071a1b3c514aa0f98f4" }
+lightcraft-pipeline = { git = "https://github.com/storytold/lightcraft", rev = "3b4279fc2485bb51847c0071a1b3c514aa0f98f4" }
+lightcraft-develop = { git = "https://github.com/storytold/lightcraft", rev = "3b4279fc2485bb51847c0071a1b3c514aa0f98f4" }
+lightcraft-raw = { git = "https://github.com/storytold/lightcraft", rev = "3b4279fc2485bb51847c0071a1b3c514aa0f98f4" }
+lightcraft-raster = { git = "https://github.com/storytold/lightcraft", rev = "3b4279fc2485bb51847c0071a1b3c514aa0f98f4" }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+
+[profile.release]
+opt-level = 3
+debug = false
+strip = "debuginfo"
+lto = "thin"
+codegen-units = 4
+panic = "unwind"

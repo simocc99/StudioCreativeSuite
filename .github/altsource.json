@@ -1,0 +1,15 @@
+{
+  "source": {
+    "name": "Studio Creative Suite",
+    "subtitle": "Suite creativa nativa per iPad",
+    "description": "Build automatiche di Studio Creative Suite, una per ogni commit sul ramo principale. Pacchetti non firmati: SideStore, AltStore o LiveContainer li firmano sul dispositivo con il tuo Apple Account.",
+    "tintColor": "5B4BDB"
+  },
+  "app": {
+    "name": "Studio Creative Suite",
+    "subtitle": "Foto RAW, video, audio, vettoriale, pittura, impaginazione e PDF",
+    "localizedDescription": "Suite creativa per iPad che lavora tutta sul dispositivo: sviluppo RAW (DNG, CR2, CR3, NEF, ARW, RAF, RW2) con il motore LightCraft, fotoritocco a livelli, vettoriale con SVG, pittura con Apple Pencil, montaggio video multitraccia con export H.264/HEVC/ProRes, motion graphics, animazione 2D, audio multitraccia, impaginazione e PDF. Non affiliata ad Adobe.",
+    "tintColor": "5B4BDB",
+    "category": "photo-video"
+  }
+}

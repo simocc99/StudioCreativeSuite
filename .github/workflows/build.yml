@@ -1,0 +1,223 @@
+# Every commit on the default branch: unsigned IPA (Xcode beta, macOS runner) → release
+# build-<run> → AltSource regenerated at releases/download/source/apps.json.
+# Pull requests only build. Docs: docs/CI.md.
+name: Build, release and AltSource
+
+on:
+  push:
+    branches: ['**']
+    tags-ignore: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  # keep every build on the default branch; superseded PR/branch builds can go
+  cancel-in-progress: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+
+jobs:
+  checks:
+    name: CI script tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m unittest discover -s Scripts/ci -p 'test_*.py' -v
+
+  build:
+    name: Unsigned IPA (Xcode beta)
+    needs: checks
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 90
+    env:
+      STUDIO_BUILD_NUMBER: ${{ github.run_number }}
+      STUDIO_REPOSITORY: ${{ github.repository }}
+      STUDIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select newest Xcode beta
+        env:
+          XCODE_ALLOW_STABLE: ${{ vars.XCODE_ALLOW_STABLE }}
+        run: python3 Scripts/ci/select_xcode.py >> "$GITHUB_ENV"
+
+      - name: Bundle identifier
+        env:
+          BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+        run: |
+          owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9\n' '-')
+          echo "STUDIO_BUNDLE_ID=${BUNDLE_ID:-io.github.$owner.studiocreativesuite}" >> "$GITHUB_ENV"
+
+      - run: xcodebuild -version && xcodebuild -showsdks | grep -i ios
+
+      - name: Rust toolchain for iOS
+        run: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+            export PATH="$HOME/.cargo/bin:$PATH"
+          fi
+          rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+          cargo --version
+
+      - name: Cache Rust build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            Engines/studio-photo-engine/target
+          key: rust-${{ runner.arch }}-${{ env.XCODE_CACHE_ID }}-${{ hashFiles('Engines/studio-photo-engine/Cargo.lock', 'Engines/studio-photo-engine/src/**') }}
+          restore-keys: rust-${{ runner.arch }}-${{ env.XCODE_CACHE_ID }}-
+
+      - name: Photo engine (LightCraft, Rust → XCFramework)
+        run: Scripts/build-photo-engine.sh
+
+      - name: Archive and package unsigned IPA
+        run: Scripts/ci/build-unsigned-ipa.sh
+
+      - name: Summary
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json; b = json.load(open('build/ci/build-info.json'))
+          print(f"### {b['name']} {b['version']} ({b['buildVersion']})")
+          print(f"- bundle: `{b['bundleIdentifier']}` · iPadOS {b['minOSVersion']}+ · {b['size']/1e6:.1f} MB")
+          print(f"- SDK `{b['sdk']}`, Xcode build `{b['xcode']}`")
+          print(f"- sha256 `{b['sha256']}`")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: |
+            build/ci/StudioCreativeSuite.ipa
+            build/ci/build-info.json
+            build/ci/xcode-version.txt
+          if-no-files-found: error
+
+  tests:
+    name: Unit tests on iPad simulator (informational)
+    needs: checks
+    if: ${{ vars.RUN_TESTS != 'false' }}
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    timeout-minutes: 90
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode beta
+        env:
+          XCODE_ALLOW_STABLE: ${{ vars.XCODE_ALLOW_STABLE }}
+        run: python3 Scripts/ci/select_xcode.py >> "$GITHUB_ENV"
+      - run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            Engines/studio-photo-engine/target
+          key: rust-${{ runner.arch }}-${{ env.XCODE_CACHE_ID }}-${{ hashFiles('Engines/studio-photo-engine/Cargo.lock', 'Engines/studio-photo-engine/src/**') }}
+          restore-keys: rust-${{ runner.arch }}-${{ env.XCODE_CACHE_ID }}-
+      - uses: actions/cache@v4
+        with:
+          path: build/test-raws
+          key: test-raws-${{ hashFiles('Scripts/fetch-test-raws.sh') }}
+      - run: Scripts/build-photo-engine.sh
+      - run: Scripts/fetch-test-raws.sh || echo '::warning::RAW samples unavailable; RAW tests will be skipped'
+      - name: Run tests on the first available iPad simulator
+        run: |
+          udid=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for r in sorted(d, reverse=True) if "iOS" in r for x in d[r] if "iPad" in x["name"]))')
+          DEST="platform=iOS Simulator,id=$udid" Scripts/run-tests.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: |
+            build/test-report.json
+            build/test.log
+          if-no-files-found: ignore
+
+  release:
+    name: Release build-${{ github.run_number }}
+    needs: build
+    if: ${{ github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: build-${{ github.run_number }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ipa
+          path: artifacts
+      - name: Create or update the release for this commit
+        run: |
+          python3 - <<'PY' > notes.md
+          import json, os; b = json.load(open('artifacts/build-info.json'))
+          print((b['commitMessage'] or 'Build automatica').strip())
+          print(f"\n---\nCommit {b['commit']}\n\nVersione {b['version']} ({b['buildVersion']}), iPadOS {b['minOSVersion']}+, {b['size']/1e6:.1f} MB")
+          print(f"\nsha256 `{b['sha256']}`\n\nIPA non firmata: installala con SideStore, AltStore o LiveContainer, oppure aggiungi la sorgente")
+          print(f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/releases/download/source/apps.json")
+          PY
+          files="artifacts/StudioCreativeSuite.ipa artifacts/build-info.json artifacts/xcode-version.txt"
+          if gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" $files -R "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$TAG" $files -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease --latest=false \
+              --title "Build ${{ github.run_number }} (${GITHUB_SHA:0:7})" --notes-file notes.md
+          fi
+
+  source:
+    name: Update AltSource
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # one writer at a time; a skipped intermediate run is harmless because the feed is
+    # rebuilt from all releases every time
+    concurrency:
+      group: altsource
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KEEP_BUILDS: ${{ vars.KEEP_BUILDS || '15' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keep the newest builds, delete older ones
+        run: |
+          gh release list -R "$GITHUB_REPOSITORY" --limit 1000 --json tagName --jq '.[].tagName' \
+            | grep -E '^build-[0-9]+$' | sort -t- -k2 -nr > builds.txt
+          head -n "$KEEP_BUILDS" builds.txt > keep.txt
+          tail -n +"$((KEEP_BUILDS + 1))" builds.txt | while read -r tag; do
+            echo "deleting $tag"; gh release delete "$tag" -R "$GITHUB_REPOSITORY" --cleanup-tag --yes
+          done
+          cat keep.txt
+      - name: Collect build metadata
+        run: |
+          while read -r tag; do
+            gh release download "$tag" -R "$GITHUB_REPOSITORY" --pattern build-info.json --dir "work/builds/$tag" \
+              || echo "::warning::$tag has no build-info.json; left out of the feed"
+          done < keep.txt
+      - name: Generate apps.json
+        run: |
+          python3 Scripts/ci/altsource.py --repo "$GITHUB_REPOSITORY" --builds work/builds \
+            --branding .github/altsource.json --icon App/StudioApp/Assets.xcassets/AppIcon.appiconset/AppIcon.png \
+            --output work/source
+      - name: Publish to the fixed "source" release
+        run: |
+          if ! gh release view source -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create source -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --latest --title 'AltSource' \
+              --notes "Sorgente per SideStore / AltStore: https://github.com/$GITHUB_REPOSITORY/releases/download/source/apps.json — contiene anche l'ultima IPA (StudioCreativeSuite.ipa). Le singole build sono nelle release build-N."
+          fi
+          newest=$(head -n1 keep.txt)
+          gh release download "$newest" -R "$GITHUB_REPOSITORY" --pattern StudioCreativeSuite.ipa --dir work/latest
+          gh release upload source -R "$GITHUB_REPOSITORY" work/source/icon-*.png work/latest/StudioCreativeSuite.ipa --clobber
+          gh release upload source -R "$GITHUB_REPOSITORY" work/source/apps.json --clobber
+      - name: Verify the published feed
+        run: |
+          gh release download source -R "$GITHUB_REPOSITORY" --pattern apps.json --dir work/check
+          python3 -c 'import json,sys; a=json.load(open("work/check/apps.json")); b=json.load(open("work/source/apps.json")); sys.exit(0 if a==b else "published apps.json differs")'
+          echo "AltSource: https://github.com/$GITHUB_REPOSITORY/releases/download/source/apps.json" >> "$GITHUB_STEP_SUMMARY"
