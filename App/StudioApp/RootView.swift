@@ -32,8 +32,9 @@ struct RootView: View {
     @State private var state: AppState
     @State private var columns: NavigationSplitViewVisibility = .all
 
-    init(state: AppState = AppState()) {
-        _state = State(initialValue: state)
+    @MainActor
+    init(state: AppState? = nil) {
+        _state = State(initialValue: state ?? AppState())
     }
 
     var body: some View {
