@@ -194,13 +194,15 @@ public struct PDFEditorView: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture { if let p = model.document.page(at: i) { model.pdfView?.go(to: p) } }
+                .listRowBackground(Color.clear)
             }
             .onMove { model.move(from: $0, to: $1) }
             Button { PDFOperations.insertBlankPage(model.document, at: model.currentPage + 1); model.changed() } label: {
                 Label("Pagina vuota", systemImage: "plus")
             }
+            .listRowBackground(Color.clear)
         }
-        .listStyle(.plain)
+        .studioList()
         .id(model.revision)
     }
 
@@ -218,8 +220,9 @@ public struct PDFEditorView: View {
                         Text(context(r)).font(.caption).lineLimit(2)
                     }
                 }
+                .listRowBackground(Color.clear)
             }
-            .listStyle(.plain)
+            .studioList()
             Text("Annotazioni: \(PDFOperations.annotationCount(model.document))").font(.caption2).foregroundStyle(.secondary).id(model.revision)
         }
         .padding()

@@ -50,6 +50,12 @@ public extension View {
             }
     }
 
+    /// Lists inside panels: no system background, so the panel colour shows through.
+    /// Rows still need `.listRowBackground(Color.clear)` (or a selection tint).
+    func studioList() -> some View {
+        listStyle(.plain).scrollContentBackground(.hidden)
+    }
+
     /// Editor chrome: navigation bar in the panel colour, always visible.
     func studioEditorChrome() -> some View {
         toolbarBackground(StudioTheme.panel, for: .navigationBar)

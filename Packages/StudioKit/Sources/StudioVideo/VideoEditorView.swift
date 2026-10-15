@@ -177,8 +177,9 @@ struct MediaBinView: View {
                     }
                 }
                 .draggable(item.path)
+                .listRowBackground(Color.clear)
             }
-            .listStyle(.plain)
+            .studioList()
         }
         .background(StudioTheme.panel)
     }

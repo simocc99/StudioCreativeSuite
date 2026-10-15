@@ -261,6 +261,7 @@ public struct MotionEditorView: View {
                     .buttonStyle(.plain)
                 }
                 .tag(l.id)
+                .listRowBackground(model.selected == l.id ? StudioTheme.accent.opacity(0.18) : Color.clear)
             }
             .onMove { from, to in
                 // the list shows top layer first; convert to bottom → top indices
@@ -277,6 +278,7 @@ public struct MotionEditorView: View {
                 }
             }
         }
+        .studioList()
         .overlay {
             if model.doc.layers.isEmpty {
                 ContentUnavailableView("Composizione vuota", systemImage: "sparkles", description: Text("Aggiungi forme, testi o immagini dal menu Livello."))
