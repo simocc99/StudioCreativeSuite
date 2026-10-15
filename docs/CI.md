@@ -17,7 +17,7 @@ Modellato sui workflow di [Xarber/LiveContainer27](https://github.com/Xarber/Liv
 | Job | Runner | Cosa fa | Quando |
 |---|---|---|---|
 | `checks` | Ubuntu | test degli script CI (`Scripts/ci/test_ci_scripts.py`) | sempre |
-| `build` | macOS (`macos-26`) | sceglie l'**Xcode beta** più recente, compila il motore Rust, archivia in Release **senza certificato**, applica una firma ad-hoc con le entitlement dell'app, crea `StudioCreativeSuite.ipa`, la verifica e scrive `build-info.json` | sempre (anche PR) |
+| `build` | macOS (`xcode-27`, immagine GitHub in anteprima pubblica con Xcode 27.x beta) | sceglie l'**Xcode beta** più recente, compila il motore Rust, archivia in Release **senza certificato**, applica una firma ad-hoc con le entitlement dell'app, crea `StudioCreativeSuite.ipa`, la verifica e scrive `build-info.json` | sempre (anche PR) |
 | `tests` | macOS | test XCTest sul primo simulatore iPad disponibile, con i RAW di prova CC0; **informativo**, non blocca la pubblicazione | sempre, disattivabile |
 | `release` | Ubuntu | crea la prerelease `build-<numero run>` con IPA, `build-info.json`, versione di Xcode e note dal messaggio di commit | solo push sul ramo principale |
 | `source` | Ubuntu | tiene le ultime N build (cancella le più vecchie con il loro tag), **rigenera** `apps.json` da quelle rimaste, lo pubblica nella release fissa `source` insieme all'ultima IPA e all'icona, poi lo riscarica e confronta | dopo `release` |
@@ -37,7 +37,7 @@ Impostazioni › Secrets and variables › Actions › Variables:
 |---|---|---|
 | `BUNDLE_ID` | `io.github.<utente>.studiocreativesuite` | identificativo dell'app nelle build CI |
 | `KEEP_BUILDS` | `15` | build conservate nelle release e nella sorgente |
-| `MACOS_RUNNER` | `macos-26` | etichetta del runner macOS (es. `macos-latest` o un runner proprio) |
+| `MACOS_RUNNER` | `xcode-27` | etichetta del runner macOS; `macos-26` ha solo Xcode 26 stabili, senza beta |
 | `XCODE_ALLOW_STABLE` | non impostata | `true` per accettare Xcode stabile quando non c'è una beta |
 | `RUN_TESTS` | non impostata | `false` per saltare i test sul simulatore |
 
@@ -58,4 +58,4 @@ Scripts/ci/build-unsigned-ipa.sh
 python3 -m unittest discover -s Scripts/ci -p 'test_*.py'
 ```
 
-Verifica fatta il 15/10/2026 sul Mac (Xcode 27.0 stabile, perché in locale non c'è una beta): archivio Release senza certificato riuscito, IPA da 12,9 MB che supera `Scripts/verify-ipa.sh`, `build-info.json` con l'entitlement `increased-memory-limit` e la descrizione d'uso del microfono, `apps.json` generato con il formato AltSource, IPA ri-firmata con un certificato di sviluppo e verificata con `codesign --verify --strict`. Il workflow su GitHub non è ancora stato eseguito.
+Verifica locale del 15/10/2026 sul Mac (Xcode 27.0 stabile, perché in locale non c'è una beta): archivio Release senza certificato riuscito, IPA da 12,9 MB che supera `Scripts/verify-ipa.sh`, `build-info.json` con l'entitlement `increased-memory-limit` e la descrizione d'uso del microfono, `apps.json` generato con il formato AltSource, IPA ri-firmata con un certificato di sviluppo e verificata con `codesign --verify --strict`.
