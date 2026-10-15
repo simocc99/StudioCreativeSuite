@@ -36,7 +36,7 @@ struct TimelineView: View {
                     .onEnded { _ in zoomBase = nil }
             )
         }
-        .background(Color(white: 0.12))
+        .background(StudioTheme.background)
     }
 
     var contentWidth: CGFloat { CGFloat(max(model.doc.duration + 30, 60) * pps) }
@@ -64,7 +64,7 @@ struct TimelineView: View {
             }
         }
         .frame(width: Self.headerWidth)
-        .background(Color(white: 0.16))
+        .background(StudioTheme.panel)
     }
 
     private func toggle(_ icon: String, _ on: Bool, _ change: @escaping (inout VideoProject) -> Void) -> some View {
@@ -147,7 +147,7 @@ struct TimelineView: View {
     }
 
     private var playheadLine: some View {
-        Rectangle().fill(Color.red).frame(width: 2)
+        Rectangle().fill(StudioTheme.playhead).frame(width: 2)
             .frame(maxHeight: .infinity)
             .offset(x: model.playhead * pps - 1)
             .allowsHitTesting(false)

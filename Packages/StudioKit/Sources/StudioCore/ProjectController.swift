@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import Observation
 
@@ -62,6 +63,13 @@ public final class ProjectController<P: ProjectPayload> {
         } catch {
             lastError = .io(error.localizedDescription)
         }
+    }
+
+    /// Writes the project's preview for the home and project lists (best effort, off the main thread).
+    public func saveThumbnail(_ image: CGImage?) {
+        guard let image else { return }
+        let project = url
+        Task.detached(priority: .utility) { ProjectStore.writeThumbnail(image, to: project) }
     }
 
     private func scheduleAutosave() {

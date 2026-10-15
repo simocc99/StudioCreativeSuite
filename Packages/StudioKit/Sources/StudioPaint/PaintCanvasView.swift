@@ -28,7 +28,7 @@ final class PaintCanvasUIView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = UIColor(white: 0.18, alpha: 1)
+        backgroundColor = UIColor(red: 0.078, green: 0.078, blue: 0.086, alpha: 1) // StudioTheme.canvas
         layer.addSublayer(canvasLayer)
         canvasLayer.masksToBounds = true
         canvasLayer.shadowOpacity = 0.4

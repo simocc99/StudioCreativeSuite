@@ -132,14 +132,12 @@ public struct PDFEditorView: View {
 
     public var body: some View {
         HStack(spacing: 0) {
-            pages.frame(width: 170)
-            Divider()
+            pages.studioPanel(width: 170, edge: .trailing)
             VStack(spacing: 0) {
-                modeBar
+                modeBar.studioBar(edge: .bottom)
                 PDFKitView(model: model)
             }
-            Divider()
-            searchPanel.frame(width: 260)
+            searchPanel.studioPanel(width: 260)
         }
         .navigationTitle(model.url.deletingPathExtension().lastPathComponent + (model.dirty ? " •" : ""))
         .navigationBarTitleDisplayMode(.inline)
@@ -225,7 +223,7 @@ public struct PDFEditorView: View {
             Text("Annotazioni: \(PDFOperations.annotationCount(model.document))").font(.caption2).foregroundStyle(.secondary).id(model.revision)
         }
         .padding()
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private func context(_ s: PDFSelection) -> String {

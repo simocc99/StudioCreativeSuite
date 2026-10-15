@@ -354,10 +354,8 @@ public struct RasterEditorView: View {
     public var body: some View {
         HStack(spacing: 0) {
             tools
-            Divider()
             canvas
-            Divider()
-            panel.frame(width: 300)
+            panel.studioPanel(width: 300)
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -377,24 +375,22 @@ public struct RasterEditorView: View {
         }
         .shareSheet($model.exported)
         .overlay(alignment: .top) { if let e = model.error { ErrorBanner(e) { model.error = nil } } }
-        .onDisappear { model.save() }
+        .onDisappear {
+            model.save()
+            model.project.saveThumbnail(model.image)
+        }
     }
 
     private var tools: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             ForEach(RasterTool.allCases, id: \.self) { t in
-                Button { model.tool = t } label: {
-                    Image(systemName: t.icon).frame(width: 40, height: 40)
-                        .background(model.tool == t ? Color.accentColor.opacity(0.3) : .clear, in: RoundedRectangle(cornerRadius: 8))
-                }
-                .accessibilityLabel(t.title)
+                ToolRailButton(t.title, systemImage: t.icon, isSelected: model.tool == t) { model.tool = t }
             }
+            RailDivider()
             ColorPicker("Colore", selection: Binding(get: { Color(rgba: model.brush.color) }, set: { model.brush.color = RGBAColor($0) })).labelsHidden()
             Spacer()
         }
-        .padding(.vertical)
-        .frame(width: 60)
-        .background(Color(uiColor: .secondarySystemBackground))
+        .studioRail()
     }
 
     private var canvas: some View {
@@ -404,7 +400,7 @@ public struct RasterEditorView: View {
             let origin = CGPoint(x: (geo.size.width - CGFloat(d.width) * s) / 2, y: (geo.size.height - CGFloat(d.height) * s) / 2)
             let toDoc = { (p: CGPoint) in CGPoint(x: (p.x - origin.x) / s, y: (p.y - origin.y) / s) }
             ZStack(alignment: .topLeading) {
-                Color(white: 0.2)
+                StudioTheme.canvas
                 if let img = model.image {
                     Image(decorative: img, scale: 1).resizable().frame(width: CGFloat(d.width) * s, height: CGFloat(d.height) * s)
                         .offset(x: origin.x, y: origin.y)
@@ -484,7 +480,7 @@ public struct RasterEditorView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private func layerPanel(_ l: RasterLayer) -> some View {

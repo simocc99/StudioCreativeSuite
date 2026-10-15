@@ -50,8 +50,7 @@ public struct AssetBrowserView: View {
                 }
             }
             if let a = selectedAsset {
-                Divider()
-                detail(a).frame(width: 300)
+                detail(a).studioPanel(width: 300)
             }
         }
         .navigationTitle("Libreria asset")
@@ -96,7 +95,7 @@ public struct AssetBrowserView: View {
             }
             .font(.callout)
             .padding(.horizontal, 10).padding(.vertical, 5)
-            .background(selected ? Color.accentColor.opacity(0.3) : Color.gray.opacity(0.15), in: Capsule())
+            .background(selected ? StudioTheme.accent.opacity(0.3) : StudioTheme.raised, in: Capsule())
         }
         .buttonStyle(.plain)
     }
@@ -141,7 +140,7 @@ public struct AssetBrowserView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private func addTag(_ a: Asset) {

@@ -103,18 +103,16 @@ public struct LayoutEditorView: View {
 
     public var body: some View {
         HStack(spacing: 0) {
-            pageStrip.frame(width: 150)
-            Divider()
+            pageStrip.studioPanel(width: 150, edge: .trailing)
             GeometryReader { geo in
                 ScrollView([.horizontal, .vertical]) {
                     pageView(fit: min(geo.size.width / model.doc.size.width, geo.size.height / model.doc.size.height) * 0.92)
                         .padding(30)
                         .frame(minWidth: geo.size.width, minHeight: geo.size.height)
                 }
-                .background(Color(white: 0.25))
+                .background(StudioTheme.canvas)
             }
-            Divider()
-            inspector.frame(width: 300)
+            inspector.studioPanel(width: 300)
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -197,7 +195,7 @@ public struct LayoutEditorView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private var inspector: some View {
@@ -209,7 +207,7 @@ public struct LayoutEditorView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private func framePanel(_ f: LayoutFrame) -> some View {

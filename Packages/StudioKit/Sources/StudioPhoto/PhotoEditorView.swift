@@ -19,8 +19,7 @@ public struct PhotoEditorView: View {
     public var body: some View {
         HStack(spacing: 0) {
             canvas
-            Divider()
-            if model.engine != nil { inspector.frame(width: 340) }
+            if model.engine != nil { inspector.studioPanel(width: 340) }
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -49,7 +48,10 @@ public struct PhotoEditorView: View {
             if let p = model.exportProgress { ProgressOverlay(p) }
         }
         .task { await model.load() }
-        .onDisappear { model.project.save() }
+        .onDisappear {
+            model.project.save()
+            model.project.saveThumbnail(model.image)
+        }
     }
 
     static var importTypes: [UTType] {
@@ -61,7 +63,7 @@ public struct PhotoEditorView: View {
     private var canvas: some View {
         GeometryReader { geo in
             ZStack {
-                Color(white: 0.11)
+                StudioTheme.canvas
                 if let img = model.showBefore ? (model.beforeImage ?? model.image) : model.image {
                     Image(decorative: img, scale: displayScale)
                         .resizable()
@@ -161,7 +163,7 @@ public struct PhotoEditorView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private var geometryButtons: some View {

@@ -5,7 +5,8 @@ Un progetto è una cartella `Nome.studio/` in `Documents/Projects/` (visibile ne
 ```
 Nome.studio/
 ├── project.json
-└── Media/            copie degli originali importati e dati binari (livelli PNG, maschere, proxy)
+├── Media/            copie degli originali importati e dati binari (livelli PNG, maschere, proxy)
+└── thumbnail.jpg     anteprima facoltativa (lato lungo ≤ 640 px) scritta dagli editor alla chiusura; se manca non si perde nulla
 ```
 
 `project.json`:

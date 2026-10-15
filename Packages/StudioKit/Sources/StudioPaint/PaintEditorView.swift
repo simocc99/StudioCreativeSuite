@@ -207,15 +207,13 @@ public struct PaintEditorView: View {
     public var body: some View {
         HStack(spacing: 0) {
             brushes
-            Divider()
             PaintCanvasRepresentable(
                 state: model.state, project: model.doc, activeLayer: model.activeLayer, pencilOnly: model.pencilOnly,
                 eyedropper: model.eyedropper, revision: model.revision,
                 onStrokeBegan: { model.strokeBegan() }, onStrokeEnded: { model.strokeEnded() }, onPick: { model.pick($0) }
             )
             .accessibilityLabel("Tela di pittura")
-            Divider()
-            sidebar.frame(width: 280)
+            sidebar.studioPanel(width: 280)
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -235,28 +233,25 @@ public struct PaintEditorView: View {
         }
         .shareSheet($model.exported)
         .overlay(alignment: .top) { if let e = model.error { ErrorBanner(e) { model.error = nil } } }
-        .onDisappear { model.saveNow() }
+        .onDisappear {
+            model.saveNow()
+            model.project.saveThumbnail(model.state.flatten(model.doc))
+        }
     }
 
     private var brushes: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             ForEach(BrushKind.allCases) { k in
-                Button { model.setBrushKind(k) } label: {
-                    Image(systemName: k.icon).frame(width: 40, height: 40)
-                        .background(model.brush.kind == k ? Color.accentColor.opacity(0.3) : .clear, in: RoundedRectangle(cornerRadius: 8))
+                ToolRailButton(k.title, systemImage: k.icon, isSelected: model.brush.kind == k && !model.eyedropper) {
+                    model.eyedropper = false
+                    model.setBrushKind(k)
                 }
-                .accessibilityLabel(k.title)
             }
-            Button { model.eyedropper.toggle() } label: {
-                Image(systemName: "eyedropper").frame(width: 40, height: 40)
-                    .background(model.eyedropper ? Color.accentColor.opacity(0.3) : .clear, in: RoundedRectangle(cornerRadius: 8))
-            }
-            .accessibilityLabel("Contagocce")
+            RailDivider()
+            ToolRailButton("Contagocce", systemImage: "eyedropper", isSelected: model.eyedropper) { model.eyedropper.toggle() }
             Spacer()
         }
-        .padding(.vertical)
-        .frame(width: 60)
-        .background(Color(uiColor: .secondarySystemBackground))
+        .studioRail()
     }
 
     private var sidebar: some View {
@@ -317,6 +312,6 @@ public struct PaintEditorView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 }

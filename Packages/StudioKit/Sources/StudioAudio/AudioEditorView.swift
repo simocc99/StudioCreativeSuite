@@ -14,12 +14,10 @@ public struct AudioEditorView: View {
     public var body: some View {
         HStack(spacing: 0) {
             VStack(spacing: 0) {
-                transport
-                Divider()
+                transport.studioBar(edge: .bottom)
                 lanes
             }
-            Divider()
-            inspector.frame(width: 300)
+            inspector.studioPanel(width: 300)
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -84,10 +82,10 @@ public struct AudioEditorView: View {
             }
             .frame(width: max(1200, (model.doc.duration + 20) * model.pixelsPerSecond), alignment: .leading)
             .overlay(alignment: .topLeading) {
-                Rectangle().fill(.red).frame(width: 2).offset(x: model.playhead * model.pixelsPerSecond).allowsHitTesting(false)
+                Rectangle().fill(StudioTheme.playhead).frame(width: 2).offset(x: model.playhead * model.pixelsPerSecond).allowsHitTesting(false)
             }
         }
-        .background(Color(white: 0.1))
+        .background(StudioTheme.canvas)
     }
 
     @State private var rangeStart: Double?
@@ -140,7 +138,7 @@ public struct AudioEditorView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private func gesture(_ on: Bool) { on ? model.project.beginGesture() : model.project.endGesture() }

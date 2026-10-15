@@ -15,7 +15,13 @@ struct StudioCreativeSuiteApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if Benchmark.requested { BenchmarkView() } else { RootView() }
+                if Benchmark.requested {
+                    BenchmarkView()
+                } else if let scene = DemoScene.requested {
+                    DemoSceneView(scene: scene)
+                } else {
+                    RootView()
+                }
             }
             .preferredColorScheme(.dark)
         }

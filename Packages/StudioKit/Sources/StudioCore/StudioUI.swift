@@ -16,24 +16,28 @@ public struct PanelSection<Content: View>: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Button {
                 withAnimation(.snappy) { expanded.toggle() }
             } label: {
                 HStack {
-                    Text(title).font(.subheadline.weight(.semibold))
+                    Text(title).font(.footnote.weight(.semibold)).foregroundStyle(expanded ? .primary : .secondary)
                     Spacer()
                     Image(systemName: "chevron.right")
                         .rotationEffect(.degrees(expanded ? 90 : 0))
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.secondary)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.tertiary)
                 }
+                .frame(minHeight: 28)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityValue(expanded ? "aperta" : "chiusa")
             if expanded { content }
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
+        .overlay(alignment: .bottom) { StudioTheme.hairline.frame(height: 1) }
     }
 }
 
@@ -58,16 +62,32 @@ public struct ValueSlider: View {
         self.onEditing = onEditing
     }
 
+    /// Ranges that straddle zero (exposure, tint…) read from the centre, so the track
+    /// is neutral with a centre tick instead of an accent fill from the left.
+    private var bipolar: Bool { range.lowerBound < 0 && range.upperBound > 0 }
+
     public var body: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: 0) {
             HStack {
-                Text(label).font(.caption)
+                Text(label).font(.caption).foregroundStyle(.secondary)
                     .onTapGesture(count: 2) { onEditing(true); value = defaultValue; onEditing(false) }
                 Spacer()
-                Text(format(value)).font(.caption.monospacedDigit()).foregroundStyle(value == defaultValue ? .secondary : .primary)
+                Text(format(value)).font(.caption.monospacedDigit().weight(value == defaultValue ? .regular : .semibold))
+                    .foregroundStyle(value == defaultValue ? Color.secondary : StudioTheme.accent)
             }
             Slider(value: $value, in: range, step: step, onEditingChanged: onEditing)
-                .controlSize(.small)
+                .controlSize(.mini)
+                .tint(bipolar ? Color.white.opacity(0.22) : StudioTheme.accent)
+                .background(alignment: .center) {
+                    if bipolar {
+                        GeometryReader { g in
+                            let x = CGFloat((0 - range.lowerBound) / (range.upperBound - range.lowerBound)) * g.size.width
+                            Capsule().fill(Color.white.opacity(0.35)).frame(width: 2, height: 8)
+                                .position(x: x, y: g.size.height / 2)
+                        }
+                        .allowsHitTesting(false)
+                    }
+                }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(label)
@@ -92,7 +112,7 @@ public struct ErrorBanner: View {
             Button("Chiudi", action: dismiss).font(.callout.weight(.semibold))
         }
         .padding(12)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .studioCard(radius: 12)
         .padding()
         .transition(.move(edge: .top).combined(with: .opacity))
     }
@@ -117,7 +137,7 @@ public struct ProgressOverlay: View {
             if let cancel { Button("Annulla", role: .cancel, action: cancel) }
         }
         .padding(24)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .studioCard()
     }
 }
 

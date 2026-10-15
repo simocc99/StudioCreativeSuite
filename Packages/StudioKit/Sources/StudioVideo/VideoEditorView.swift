@@ -17,18 +17,16 @@ public struct VideoEditorView: View {
     public var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                MediaBinView(model: model, importing: $importing).frame(width: 230)
-                Divider()
+                MediaBinView(model: model, importing: $importing).studioPanel(width: 230, edge: .trailing)
                 VStack(spacing: 0) {
                     PlayerLayerView(player: model.player)
                         .aspectRatio(CGFloat(model.doc.renderWidth) / CGFloat(max(1, model.doc.renderHeight)), contentMode: .fit)
                         .background(Color.black)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color(white: 0.07))
+                        .background(StudioTheme.canvas)
                     transport
                 }
-                Divider()
-                VideoInspector(model: model).frame(width: 300)
+                VideoInspector(model: model).studioPanel(width: 300)
             }
             resizeHandle
             toolStrip
@@ -64,8 +62,8 @@ public struct VideoEditorView: View {
     }
 
     private var resizeHandle: some View {
-        Capsule().fill(Color.secondary.opacity(0.5)).frame(width: 60, height: 5).padding(.vertical, 4)
-            .frame(maxWidth: .infinity).background(Color(white: 0.14))
+        Capsule().fill(Color.white.opacity(0.25)).frame(width: 44, height: 4).padding(.vertical, 5)
+            .frame(maxWidth: .infinity).studioBar()
             .gesture(DragGesture().onChanged { v in timelineHeight = min(600, max(160, timelineHeight - v.translation.height)) })
             .accessibilityLabel("Ridimensiona timeline")
     }
@@ -83,12 +81,12 @@ public struct VideoEditorView: View {
             Text(timecode(model.doc.duration, fps: model.doc.frameRate)).font(.callout.monospacedDigit()).foregroundStyle(.secondary)
         }
         .padding(.horizontal).padding(.vertical, 8)
-        .background(Color(white: 0.1))
+        .studioBar()
     }
 
     private var toolStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) { toolButtons }
-            .background(Color(white: 0.14))
+            .studioBar()
     }
 
     private var toolButtons: some View {
@@ -182,7 +180,7 @@ struct MediaBinView: View {
             }
             .listStyle(.plain)
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     func detail(_ m: MediaItem) -> String {
@@ -206,7 +204,7 @@ struct VideoInspector: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private var projectInspector: some View {

@@ -170,12 +170,10 @@ public struct AnimationEditorView: View {
     public var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                tools.frame(width: 240)
-                Divider()
+                tools.studioPanel(width: 240, edge: .trailing)
                 canvas
             }
-            Divider()
-            frames.frame(height: 110)
+            frames.frame(height: 110).studioBar()
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -221,7 +219,7 @@ public struct AnimationEditorView: View {
                     if let c = model.current { model.commit(c) }
                     model.current = nil
                 })
-            .background(Color(white: 0.2))
+            .background(StudioTheme.canvas)
         }
     }
 
@@ -259,7 +257,7 @@ public struct AnimationEditorView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private var frames: some View {
@@ -287,6 +285,6 @@ public struct AnimationEditorView: View {
             }
         }
         .padding(.vertical, 6)
-        .background(Color(white: 0.12))
+        .background(StudioTheme.panel)
     }
 }

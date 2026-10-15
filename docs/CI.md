@@ -19,6 +19,7 @@ Modellato sui workflow di [Xarber/LiveContainer27](https://github.com/Xarber/Liv
 | `checks` | Ubuntu | test degli script CI (`Scripts/ci/test_ci_scripts.py`) | sempre |
 | `build` | macOS (`xcode-27`, immagine GitHub in anteprima pubblica con Xcode 27.x beta) | sceglie l'**Xcode beta** più recente, compila il motore Rust, archivia in Release **senza certificato**, applica una firma ad-hoc con le entitlement dell'app, crea `StudioCreativeSuite.ipa`, la verifica e scrive `build-info.json` | sempre (anche PR) |
 | `tests` | macOS | test XCTest sul primo simulatore iPad disponibile, con i RAW di prova CC0; **informativo**, non blocca la pubblicazione | sempre, disattivabile |
+| `screenshots` | macOS | compila l'app per il simulatore, avvia un iPad Pro 13" e fotografa le scene dimostrative (home, elenco progetti e ogni editor) create da `App/StudioApp/DemoScenes.swift` con l'argomento di avvio `-StudioScene`; artifact `screenshots`; **informativo** | sempre, disattivabile |
 | `release` | Ubuntu | crea la prerelease `build-<numero run>` con IPA, `build-info.json`, versione di Xcode e note dal messaggio di commit | solo push sul ramo principale |
 | `source` | Ubuntu | tiene le ultime N build (cancella le più vecchie con il loro tag), **rigenera** `apps.json` da quelle rimaste, lo pubblica nella release fissa `source` insieme all'ultima IPA e all'icona, poi lo riscarica e confronta | dopo `release` |
 
@@ -40,6 +41,7 @@ Impostazioni › Secrets and variables › Actions › Variables:
 | `MACOS_RUNNER` | `xcode-27` | etichetta del runner macOS; `macos-26` ha solo Xcode 26 stabili, senza beta |
 | `XCODE_ALLOW_STABLE` | non impostata | `true` per accettare Xcode stabile quando non c'è una beta |
 | `RUN_TESTS` | non impostata | `false` per saltare i test sul simulatore |
+| `RUN_SCREENSHOTS` | non impostata | `false` per saltare gli screenshot |
 
 ## Prima pubblicazione
 

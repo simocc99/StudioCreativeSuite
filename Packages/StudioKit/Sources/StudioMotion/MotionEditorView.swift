@@ -164,14 +164,11 @@ public struct MotionEditorView: View {
     public var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                layerList.frame(width: 220)
-                Divider()
+                layerList.studioPanel(width: 220, edge: .trailing)
                 preview
-                Divider()
-                inspector.frame(width: 300)
+                inspector.studioPanel(width: 300)
             }
-            Divider()
-            timeline.frame(height: 220)
+            timeline.frame(height: 220).studioBar()
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -238,7 +235,7 @@ public struct MotionEditorView: View {
                         model.project.endGesture()
                     })
             }
-            .background(Color(white: 0.15))
+            .background(StudioTheme.canvas)
             .accessibilityLabel("Anteprima composizione: trascina per spostare il livello selezionato")
             HStack {
                 Button { model.time = 0 } label: { Image(systemName: "backward.end.fill") }
@@ -305,7 +302,7 @@ public struct MotionEditorView: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private var compPanel: some View {
@@ -416,7 +413,7 @@ public struct MotionEditorView: View {
                         HStack(spacing: 0) {
                             Text(l.name).font(.caption).lineLimit(1).frame(width: 160, alignment: .leading).padding(.leading, 8)
                             ZStack(alignment: .leading) {
-                                Capsule().fill(model.selected == l.id ? Color.accentColor.opacity(0.5) : Color.gray.opacity(0.35))
+                                Capsule().fill(model.selected == l.id ? StudioTheme.accent.opacity(0.6) : StudioTheme.raisedStrong)
                                     .frame(width: max(4, (l.outPoint - l.inPoint) * pps), height: 16)
                                     .offset(x: l.inPoint * pps)
                                 ForEach(l.animatedProperties, id: \.0) { _, kp in
@@ -434,10 +431,10 @@ public struct MotionEditorView: View {
                     }
                 }
                 .overlay(alignment: .topLeading) {
-                    Rectangle().fill(.red).frame(width: 2).frame(maxHeight: .infinity).offset(x: 160 + model.time * pps).allowsHitTesting(false)
+                    Rectangle().fill(StudioTheme.playhead).frame(width: 2).frame(maxHeight: .infinity).offset(x: 160 + model.time * pps).allowsHitTesting(false)
                 }
             }
         }
-        .background(Color(white: 0.12))
+        .background(StudioTheme.panel)
     }
 }

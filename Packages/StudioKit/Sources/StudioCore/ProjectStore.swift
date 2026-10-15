@@ -1,4 +1,7 @@
+import CoreGraphics
 import Foundation
+import ImageIO
+import UniformTypeIdentifiers
 
 /// Header written at the top of every `project.json`. See docs/PROJECT_FORMAT.md.
 public struct ProjectHeader: Codable, Hashable, Sendable {
@@ -36,6 +39,12 @@ public struct ProjectSummary: Identifiable, Hashable, Sendable {
     public var id: URL { url }
     public let url: URL
     public let header: ProjectHeader
+
+    /// Preview written by the editor when it closes (absent for audio, PDF and new projects).
+    public var thumbnailURL: URL? {
+        let u = url.appendingPathComponent(ProjectStore.thumbnailName)
+        return FileManager.default.fileExists(atPath: u.path) ? u : nil
+    }
 }
 
 public enum StudioInfo {
@@ -86,6 +95,26 @@ public final class ProjectStore: @unchecked Sendable {
 
     public static let fileName = "project.json"
     public static let mediaFolder = "Media"
+    /// Optional JPEG preview, longest edge ≤ 640 px. Not part of the payload: losing it loses nothing.
+    public static let thumbnailName = "thumbnail.jpg"
+
+    /// Downscales `image` to ≤ 640 px on a dark matte and writes it as the project's preview.
+    public static func writeThumbnail(_ image: CGImage, to project: URL) {
+        let scale = min(1, 640 / Double(max(image.width, image.height)))
+        let w = max(1, Int(Double(image.width) * scale)), h = max(1, Int(Double(image.height) * scale))
+        guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
+                                  space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                                  bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue) else { return }
+        ctx.setFillColor(CGColor(gray: 0.08, alpha: 1))
+        ctx.fill(CGRect(x: 0, y: 0, width: w, height: h))
+        ctx.interpolationQuality = .high
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: w, height: h))
+        let dest = project.appendingPathComponent(thumbnailName)
+        guard let small = ctx.makeImage(),
+              let out = CGImageDestinationCreateWithURL(dest as CFURL, UTType.jpeg.identifier as CFString, 1, nil) else { return }
+        CGImageDestinationAddImage(out, small, [kCGImageDestinationLossyCompressionQuality: 0.8] as CFDictionary)
+        CGImageDestinationFinalize(out)
+    }
 
     public func list() -> [ProjectSummary] {
         let items = (try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)) ?? []

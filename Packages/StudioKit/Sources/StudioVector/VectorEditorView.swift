@@ -235,7 +235,6 @@ public struct VectorEditorView: View {
     public var body: some View {
         HStack(spacing: 0) {
             toolbox
-            Divider()
             GeometryReader { geo in
                 ScrollView([.horizontal, .vertical]) {
                     canvas
@@ -243,14 +242,13 @@ public struct VectorEditorView: View {
                         .padding(60)
                         .frame(minWidth: geo.size.width, minHeight: geo.size.height)
                 }
-                .background(Color(white: 0.2))
+                .background(StudioTheme.canvas)
                 .simultaneousGesture(MagnifyGesture().onChanged { v in
                     if zoomBase == nil { zoomBase = model.zoom }
                     model.zoom = min(8, max(0.05, (zoomBase ?? 1) * v.magnification))
                 }.onEnded { _ in zoomBase = nil })
             }
-            Divider()
-            VectorInspector(model: model).frame(width: 300)
+            VectorInspector(model: model).studioPanel(width: 300)
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -268,7 +266,11 @@ public struct VectorEditorView: View {
         }
         .shareSheet($model.exported)
         .overlay(alignment: .top) { if let e = model.error { ErrorBanner(e) { model.error = nil } } }
-        .onDisappear { model.project.save() }
+        .onDisappear {
+            model.project.save()
+            let d = model.project.payload
+            model.project.saveThumbnail(VectorRenderer.image(d, scale: min(1, 640 / max(d.width, d.height, 1)), opaque: true).cgImage)
+        }
         .background(shortcuts)
     }
 
@@ -291,16 +293,14 @@ public struct VectorEditorView: View {
     }
 
     private var toolbox: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             ForEach(VectorTool.allCases) { t in
-                Button { model.tool = t; if t != .pen { model.finishPen(closed: false) } } label: {
-                    Image(systemName: t.icon).frame(width: 36, height: 36)
-                        .background(model.tool == t ? Color.accentColor.opacity(0.3) : .clear, in: RoundedRectangle(cornerRadius: 8))
+                ToolRailButton(t.title, systemImage: t.icon, isSelected: model.tool == t) {
+                    model.tool = t
+                    if t != .pen { model.finishPen(closed: false) }
                 }
-                .accessibilityLabel(t.title)
-                .help(t.title)
             }
-            Divider().frame(width: 30)
+            RailDivider()
             ColorPicker("Riempimento", selection: Binding(get: { Color(rgba: model.fillColor) }, set: { model.fillColor = RGBAColor($0) })).labelsHidden()
             ColorPicker("Contorno", selection: Binding(get: { Color(rgba: model.strokeColor) }, set: { model.strokeColor = RGBAColor($0) })).labelsHidden()
             Spacer()
@@ -308,11 +308,9 @@ public struct VectorEditorView: View {
                 Button("Chiudi") { model.finishPen(closed: true) }.font(.caption)
                 Button("Fine") { model.finishPen(closed: false) }.font(.caption)
             }
-            Text("\(Int(model.zoom * 100))%").font(.caption2.monospacedDigit())
+            Text("\(Int(model.zoom * 100))%").font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
         }
-        .padding(.vertical)
-        .frame(width: 56)
-        .background(Color(uiColor: .secondarySystemBackground))
+        .studioRail()
     }
 
     private var canvas: some View {
@@ -482,7 +480,7 @@ struct VectorInspector: View {
             }
             .padding()
         }
-        .background(Color(uiColor: .secondarySystemBackground))
+        .background(StudioTheme.panel)
     }
 
     private func g(_ on: Bool) { on ? model.project.beginGesture() : model.project.endGesture() }

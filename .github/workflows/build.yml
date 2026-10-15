@@ -138,6 +138,38 @@ jobs:
             build/test.log
           if-no-files-found: ignore
 
+  screenshots:
+    name: Screenshots on iPad Pro 13" simulator (informational)
+    needs: checks
+    if: ${{ vars.RUN_SCREENSHOTS != 'false' }}
+    runs-on: ${{ vars.MACOS_RUNNER || 'xcode-27' }}
+    timeout-minutes: 60
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode beta
+        env:
+          XCODE_ALLOW_STABLE: ${{ vars.XCODE_ALLOW_STABLE }}
+        run: python3 Scripts/ci/select_xcode.py >> "$GITHUB_ENV"
+      - run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            Engines/studio-photo-engine/target
+          key: rust-${{ runner.arch }}-${{ env.XCODE_CACHE_ID }}-${{ hashFiles('Engines/studio-photo-engine/Cargo.lock', 'Engines/studio-photo-engine/src/**') }}
+          restore-keys: rust-${{ runner.arch }}-${{ env.XCODE_CACHE_ID }}-
+      - run: Scripts/build-photo-engine.sh
+      - name: Capture demo scenes
+        run: Scripts/ci/screenshots.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: build/screenshots
+          if-no-files-found: warn
+
   release:
     name: Release build-${{ github.run_number }}
     needs: build
