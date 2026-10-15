@@ -122,6 +122,24 @@ public final class PhotoEngine: @unchecked Sendable {
         }
     }
 
+    /// Lightroom-style "Auto": the engine's automatic light/colour values and B&W mix for this photo,
+    /// as a partial settings tree (`light`, `color`, `bw_mix`) to merge into `settings`.
+    public func autoSettings(_ settings: JSONValue) async throws -> JSONValue {
+        let json = settings.jsonString()
+        return try await withCheckedThrowingContinuation { cont in
+            queue.async { [self] in
+                var err: UnsafeMutablePointer<CChar>?
+                guard let out = takeString(json.withCString { sc_photo_auto_json(handle, $0, &err) }) else {
+                    cont.resume(throwing: StudioError.engine(takeString(err) ?? "regolazione automatica non riuscita"))
+                    return
+                }
+                do { cont.resume(returning: try JSONValue.parse(out)) } catch {
+                    cont.resume(throwing: StudioError.engine("risposta del motore non valida"))
+                }
+            }
+        }
+    }
+
     /// Exports the full-resolution original (re-decoded by the engine) with `settings`.
     public func export(_ settings: JSONValue, to url: URL, format: PhotoExportFormat, quality: Int = 92, longEdge: Int = 0) async throws -> PhotoExportResult {
         let json = settings.jsonString()

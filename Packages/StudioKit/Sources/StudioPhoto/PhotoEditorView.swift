@@ -11,6 +11,12 @@ public struct PhotoEditorView: View {
     @State private var pan: CGSize = .zero
     @State private var panBase: CGSize = .zero
     @Environment(\.displayScale) private var displayScale
+    @State private var tab: DevelopTab = .base
+    @State private var curveChannel = "curve.master"
+    @State private var mixerComponent = "hue"
+    @State private var wheel = "shadows"
+    @State private var savingPreset = false
+    @State private var newPresetName = ""
 
     public init(project: ProjectController<PhotoProject>) {
         _model = State(initialValue: PhotoEditorModel(project: project))
@@ -19,7 +25,7 @@ public struct PhotoEditorView: View {
     public var body: some View {
         HStack(spacing: 0) {
             canvas
-            if model.engine != nil { inspector.studioPanel(width: 340) }
+            if model.engine != nil { inspector.studioPanel(width: 360) }
         }
         .navigationTitle(model.project.header.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -117,65 +123,323 @@ public struct PhotoEditorView: View {
     }
 
     private var inspector: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 4) {
-                HistogramView(bins: model.histogram).frame(height: 70)
-                if let info = model.engine?.info { sourceBadge(info) }
-                Divider()
-                PanelSection("Profilo") {
-                    Picker("Trattamento", selection: Binding(
-                        get: { model.settings[path: "treatment"]?.stringValue ?? "color" },
-                        set: { model.setString("treatment", $0, label: "Trattamento") })) {
-                        Text("Colore").tag("color")
-                        Text("Bianco e nero").tag("bw")
+        VStack(spacing: 0) {
+            DevelopTabBar(selection: $tab)
+                .padding(.horizontal, 12).padding(.vertical, 10)
+                .overlay(alignment: .bottom) { StudioTheme.hairline.frame(height: 1) }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(tab.title).font(.title3.weight(.semibold))
+                        Spacer()
+                        if let paths = tab.resettablePaths {
+                            Button("Azzera") { model.reset(paths, label: "Azzera \(tab.title.lowercased())") }
+                                .font(.caption.weight(.semibold))
+                        }
+                    }
+                    .padding(.bottom, 4)
+                    switch tab {
+                    case .base: baseTab
+                    case .presets: presetsTab
+                    case .curve: curveTab
+                    case .color: colorTab
+                    case .effects: effectsTab
+                    case .detail: sections([DevelopControls.sharpening, DevelopControls.noise])
+                    case .optics: opticsTab
+                    case .geometry: geometryTab
+                    case .calibration: sections([DevelopControls.calibration])
+                    case .history: historyTab
+                    }
+                }
+                .padding()
+            }
+        }
+        .background(StudioTheme.panel)
+    }
+
+    private func sections(_ list: [DevelopSection]) -> some View {
+        ForEach(list) { section in
+            PanelSection(section.title) { ForEach(section.controls) { slider($0) } }
+        }
+    }
+
+    // MARK: Base
+
+    private var baseTab: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HistogramView(bins: model.histogram).frame(height: 70)
+            if let info = model.engine?.info { sourceBadge(info) }
+            HStack(spacing: 8) {
+                Button { Task { await model.autoTone() } } label: {
+                    Label(model.isAuto ? "Calcolo…" : "Auto", systemImage: "wand.and.stars").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(model.isAuto)
+                Picker("Trattamento", selection: Binding(
+                    get: { model.settings[path: "treatment"]?.stringValue ?? "color" },
+                    set: { model.setString("treatment", $0, label: "Trattamento") })) {
+                    Text("Colore").tag("color")
+                    Text("B/N").tag("bw")
+                }
+                .pickerStyle(.segmented)
+            }
+            .padding(.vertical, 8)
+            PanelSection("Profilo") {
+                let current = model.settings[path: "profile.id"]?.stringValue ?? "lc.color"
+                Menu {
+                    ForEach(Array(Set(DevelopControls.profiles.map(\.group))).sorted(by: profileGroupOrder), id: \.self) { group in
+                        Section(group) {
+                            ForEach(DevelopControls.profiles.filter { $0.group == group }) { pr in
+                                Button { model.setString("profile.id", pr.id, label: "Profilo") } label: {
+                                    if pr.id == current { Label(pr.name, systemImage: "checkmark") } else { Text(pr.name) }
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(DevelopControls.profiles.first { $0.id == current }?.name ?? current)
+                        Spacer()
+                        Image(systemName: "chevron.up.chevron.down").font(.caption)
+                    }
+                    .padding(10)
+                    .studioCard(radius: 8)
+                }
+                .buttonStyle(.plain)
+                slider(DevelopControl("profile.amount", "Intensità", 0 ... 200))
+            }
+            PanelSection(DevelopControls.whiteBalance.title) {
+                Picker("Preset", selection: Binding(
+                    get: { model.settings[path: "wb.mode"]?.stringValue ?? "asShot" },
+                    set: { model.setString("wb.mode", $0, label: "Bilanciamento") })) {
+                    ForEach(DevelopControls.wbModes, id: \.0) { Text($0.1).tag($0.0) }
+                }
+                ForEach(DevelopControls.whiteBalance.controls) { slider($0) }
+            }
+            sections([DevelopControls.light, DevelopControls.presence])
+            Button("Ripristina tutto", role: .destructive) { model.resetAll() }.padding(.top, 10)
+        }
+    }
+
+    private func profileGroupOrder(_ a: String, _ b: String) -> Bool {
+        let order = ["Base", "Pellicola", "Cinematografico", "Tenue", "Bianco e nero"]
+        return (order.firstIndex(of: a) ?? 99) < (order.firstIndex(of: b) ?? 99)
+    }
+
+    // MARK: Presets
+
+    private var presetsTab: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            if let p = model.activePreset {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("\(p.name)").font(.subheadline.weight(.semibold))
+                    ValueSlider("Intensità", value: Binding(get: { model.presetAmount * 100 }, set: { model.setPresetAmount($0 / 100) }),
+                                range: 0 ... 200, step: 1, defaultValue: 100, format: { "\(Int($0))%" }, onEditing: { model.editing($0) })
+                }
+                .padding(12)
+                .studioCard(radius: 10)
+            }
+            Button { newPresetName = ""; savingPreset = true } label: {
+                Label("Salva le impostazioni come preset", systemImage: "plus.square.on.square").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            if !model.userPresets.isEmpty { presetGroup("I miei preset", model.userPresets, deletable: true) }
+            ForEach(DevelopPreset.groups, id: \.self) { g in
+                presetGroup(g, DevelopPreset.builtIn.filter { $0.group == g }, deletable: false)
+            }
+        }
+        .alert("Nuovo preset", isPresented: $savingPreset) {
+            TextField("Nome", text: $newPresetName)
+            Button("Salva") { model.saveUserPreset(name: newPresetName) }
+            Button("Annulla", role: .cancel) {}
+        } message: {
+            Text("Salva il look di questa foto (profilo, toni, colore, effetti, dettaglio). Bilanciamento del bianco, ritaglio e geometria restano esclusi.")
+        }
+    }
+
+    private func presetGroup(_ title: String, _ presets: [DevelopPreset], deletable: Bool) -> some View {
+        PanelSection(title, expanded: title == "I miei preset" || title == "Correzioni") {
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+                ForEach(presets) { p in
+                    Button { model.applyPreset(p) } label: {
+                        VStack(spacing: 0) {
+                            ZStack {
+                                StudioTheme.canvas
+                                if let img = model.presetThumbnails[p.id] {
+                                    Image(decorative: img, scale: 1).resizable().aspectRatio(contentMode: .fill)
+                                } else {
+                                    ProgressView().controlSize(.small)
+                                }
+                            }
+                            .frame(height: 82)
+                            .clipped()
+                            Text(p.name).font(.caption2.weight(.medium)).lineLimit(1).padding(.vertical, 5).padding(.horizontal, 4)
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .studioCard(radius: 8, selected: model.activePreset?.id == p.id)
+                    }
+                    .buttonStyle(.plain)
+                    .task(id: model.thumbnailEpoch) { await model.thumbnail(for: p) }
+                    .contextMenu {
+                        if deletable {
+                            Button(role: .destructive) { model.deleteUserPreset(p) } label: { Label("Elimina preset", systemImage: "trash") }
+                        }
+                    }
+                    .accessibilityLabel("Preset \(p.name)")
+                }
+            }
+        }
+    }
+
+    // MARK: Curve
+
+    private var curveTab: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Picker("Canale", selection: $curveChannel) {
+                ForEach(DevelopControls.curveChannels, id: \.path) { Text($0.name).tag($0.path) }
+            }
+            .pickerStyle(.segmented)
+            ToneCurveEditor(points: model.curvePoints(curveChannel), tint: curveTint,
+                            onChange: { model.setCurve(curveChannel, $0) }, onEditing: { model.editing($0) })
+            Text("Trascina sulla curva per aggiungere un punto; trascina un punto fuori dal riquadro per toglierlo.")
+                .font(.caption2).foregroundStyle(.secondary)
+            Button("Curva lineare") { model.setCurve(curveChannel, []) }.font(.caption.weight(.semibold))
+            sections([DevelopControls.curveRegions])
+        }
+    }
+
+    private var curveTint: Color {
+        switch curveChannel {
+        case "curve.red": .red
+        case "curve.green": .green
+        case "curve.blue": Color(red: 0.35, green: 0.55, blue: 1)
+        default: .white
+        }
+    }
+
+    // MARK: Color
+
+    private var colorTab: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if (model.settings[path: "treatment"]?.stringValue ?? "color") == "bw" {
+                sections([DevelopControls.bwMix])
+            } else {
+                PanelSection("Miscelatore colore") {
+                    Picker("Componente", selection: $mixerComponent) {
+                        Text("Tonalità").tag("hue")
+                        Text("Saturazione").tag("sat")
+                        Text("Luminanza").tag("lum")
                     }
                     .pickerStyle(.segmented)
-                }
-                PanelSection(DevelopControls.whiteBalance.title) {
-                    Picker("Preset", selection: Binding(
-                        get: { model.settings[path: "wb.mode"]?.stringValue ?? "asShot" },
-                        set: { model.setString("wb.mode", $0, label: "Bilanciamento") })) {
-                        ForEach(DevelopControls.wbModes, id: \.0) { Text($0.1).tag($0.0) }
-                    }
-                    ForEach(DevelopControls.whiteBalance.controls) { slider($0) }
-                }
-                ForEach(DevelopControls.sections) { section in
-                    PanelSection(section.title, expanded: section.title == "Luce") {
-                        ForEach(section.controls) { slider($0) }
-                        if section.title == "Geometria" { geometryButtons }
-                    }
-                }
-                PanelSection("Preset", expanded: false) {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], spacing: 8) {
-                        ForEach(DevelopPreset.builtIn) { p in
-                            Button(p.name) { model.applyPreset(p) }.buttonStyle(.bordered).frame(maxWidth: .infinity)
+                    ForEach(Array(zip(DevelopControls.bands, DevelopControls.mixer(mixerComponent))), id: \.1.path) { band, c in
+                        HStack(alignment: .bottom, spacing: 8) {
+                            Circle().fill(Color(hue: band.hue / 360, saturation: 0.8, brightness: 0.9)).frame(width: 10, height: 10)
+                                .padding(.bottom, 8)
+                            slider(c)
                         }
                     }
                 }
-                PanelSection("Cronologia", expanded: false) {
-                    let past = model.project.history.past
-                    if past.isEmpty { Text("Nessuna modifica").font(.caption).foregroundStyle(.secondary) }
-                    ForEach(Array(past.enumerated().reversed()), id: \.offset) { _, e in
-                        Text(e.label).font(.caption)
-                    }
-                }
-                Button("Ripristina tutto", role: .destructive) { model.resetAll() }.padding(.top, 8)
             }
-            .padding()
+            PanelSection("Color grading") {
+                Picker("Ruota", selection: $wheel) {
+                    ForEach(DevelopControls.wheels) { Text($0.name).tag($0.key) }
+                }
+                .pickerStyle(.segmented)
+                ColorWheel(hue: model.value("grading.\(wheel).hue"), sat: model.value("grading.\(wheel).sat"),
+                           onChange: { h, s in
+                               model.set("grading.\(wheel).hue", h, label: "Color grading")
+                               model.set("grading.\(wheel).sat", s, label: "Color grading")
+                           },
+                           onEditing: { model.editing($0) })
+                    .frame(maxWidth: 220)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                HStack {
+                    Text("Tonalità \(Int(model.value("grading.\(wheel).hue")))° · saturazione \(Int(model.value("grading.\(wheel).sat")))")
+                        .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Azzera") {
+                        model.reset(["hue", "sat", "lum"].map { "grading.\(wheel).\($0)" }, label: "Azzera ruota")
+                    }
+                    .font(.caption.weight(.semibold))
+                }
+                slider(DevelopControl("grading.\(wheel).lum", "Luminanza", -100 ... 100))
+                ForEach(DevelopControls.gradingBlend.controls) { slider($0) }
+            }
         }
-        .background(StudioTheme.panel)
+    }
+
+    // MARK: Effects, optics, geometry
+
+    private var effectsTab: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            PanelSection(DevelopControls.vignette.title) {
+                Picker("Stile", selection: Binding(
+                    get: { model.settings[path: "vignette.style"]?.stringValue ?? "highlightPriority" },
+                    set: { model.setString("vignette.style", $0, label: "Stile vignettatura") })) {
+                    ForEach(DevelopControls.vignetteStyles, id: \.0) { Text($0.1).tag($0.0) }
+                }
+                ForEach(DevelopControls.vignette.controls) { slider($0) }
+            }
+            sections([DevelopControls.grain])
+        }
+    }
+
+    private var opticsTab: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            PanelSection("Correzioni automatiche") {
+                toggle("optics.remove_ca", "Rimuovi aberrazione cromatica")
+                toggle("optics.lens_profile", "Usa il profilo dell'obiettivo")
+                if model.settings[path: "optics.lens_profile"]?.boolValue == true {
+                    ForEach(DevelopControls.lensProfile.controls) { slider($0) }
+                }
+            }
+            sections([DevelopControls.manualOptics, DevelopControls.defringe])
+        }
+    }
+
+    private var geometryTab: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            geometryButtons.padding(.vertical, 6)
+            sections([DevelopControls.geometry])
+        }
+    }
+
+    private var historyTab: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            let past = model.project.history.past
+            if past.isEmpty { Text("Nessuna modifica").font(.caption).foregroundStyle(.secondary) }
+            ForEach(Array(past.enumerated().reversed()), id: \.offset) { _, e in
+                Text(e.label).font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 6)
+                    .overlay(alignment: .bottom) { StudioTheme.hairline.frame(height: 1) }
+            }
+            Button("Ripristina tutto", role: .destructive) { model.resetAll() }.padding(.top, 10)
+        }
+    }
+
+    private func toggle(_ path: String, _ label: String) -> some View {
+        Toggle(label, isOn: Binding(get: { model.settings[path: path]?.boolValue ?? false },
+                                    set: { model.setBool(path, $0, label: label) }))
+            .font(.callout)
+            .tint(StudioTheme.accent)
     }
 
     private var geometryButtons: some View {
         HStack {
             Button { model.rotate(clockwise: false) } label: { Image(systemName: "rotate.left") }
+                .accessibilityLabel("Ruota a sinistra")
             Button { model.rotate(clockwise: true) } label: { Image(systemName: "rotate.right") }
+                .accessibilityLabel("Ruota a destra")
             Button { model.setBool("crop.flip_h", !(model.settings[path: "crop.flip_h"]?.boolValue ?? false), label: "Rifletti") } label: {
                 Image(systemName: "arrow.left.and.right.righttriangle.left.righttriangle.right")
             }
+            .accessibilityLabel("Rifletti in orizzontale")
             Button { model.setBool("crop.flip_v", !(model.settings[path: "crop.flip_v"]?.boolValue ?? false), label: "Rifletti") } label: {
                 Image(systemName: "arrow.up.and.down.righttriangle.up.righttriangle.down")
             }
+            .accessibilityLabel("Rifletti in verticale")
         }
         .buttonStyle(.bordered)
     }
@@ -257,6 +521,82 @@ struct PhotoExportSheet: View {
                         Task { await model.export(format: format, quality: Int(quality), longEdge: longEdge) }
                     }
                 }
+            }
+        }
+    }
+}
+
+/// Inspector tabs of the develop editor (Lightroom's panels).
+enum DevelopTab: String, CaseIterable, Identifiable {
+    case base, presets, curve, color, effects, detail, optics, geometry, calibration, history
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .base: "Base"
+        case .presets: "Preset"
+        case .curve: "Curva"
+        case .color: "Colore"
+        case .effects: "Effetti"
+        case .detail: "Dettaglio"
+        case .optics: "Ottica"
+        case .geometry: "Geometria"
+        case .calibration: "Calibrazione"
+        case .history: "Cronologia"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .base: "slider.horizontal.3"
+        case .presets: "camera.filters"
+        case .curve: "chart.xyaxis.line"
+        case .color: "paintpalette"
+        case .effects: "circle.lefthalf.filled"
+        case .detail: "camera.macro"
+        case .optics: "camera.aperture"
+        case .geometry: "perspective"
+        case .calibration: "dial.medium"
+        case .history: "clock.arrow.circlepath"
+        }
+    }
+
+    /// Settings the "Azzera" button of the tab returns to the engine defaults (nil: no button).
+    var resettablePaths: [String]? {
+        switch self {
+        case .curve: (DevelopControls.curveRegions.controls.map(\.path)) + DevelopControls.curveChannels.map(\.path)
+        case .color: DevelopPreset.lookPaths.filter { $0.hasPrefix("mixer.") || $0.hasPrefix("grading.") || $0.hasPrefix("bw_mix.") }
+        case .effects: (DevelopControls.vignette.controls + DevelopControls.grain.controls).map(\.path) + ["vignette.style"]
+        case .detail: (DevelopControls.sharpening.controls + DevelopControls.noise.controls).map(\.path)
+        case .optics: (DevelopControls.lensProfile.controls + DevelopControls.manualOptics.controls + DevelopControls.defringe.controls).map(\.path)
+            + ["optics.remove_ca", "optics.lens_profile"]
+        case .geometry: DevelopControls.geometry.controls.map(\.path)
+        case .calibration: DevelopControls.calibration.controls.map(\.path)
+        case .base, .presets, .history: nil
+        }
+    }
+}
+
+/// Two rows of icon tabs with their names, the selected one filled with the accent.
+struct DevelopTabBar: View {
+    @Binding var selection: DevelopTab
+
+    var body: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 5), spacing: 6) {
+            ForEach(DevelopTab.allCases) { t in
+                Button { selection = t } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: t.icon).font(.system(size: 15, weight: .medium)).frame(height: 18)
+                        Text(t.title).font(.system(size: 9, weight: .medium)).lineLimit(1).minimumScaleFactor(0.7)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .foregroundStyle(selection == t ? Color.white : Color.secondary)
+                    .background(selection == t ? StudioTheme.accent : Color.clear, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(t.title)
+                .accessibilityAddTraits(selection == t ? .isSelected : [])
             }
         }
     }

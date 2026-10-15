@@ -18,6 +18,17 @@ public final class PhotoEditorModel {
     public var exportProgress: String?
     public var exported: ExportedFile?
 
+    /// Preset browsing: presets apply to the settings from before the first preset of a browse,
+    /// so trying one after another never stacks them. Any other edit ends the browse.
+    public private(set) var activePreset: DevelopPreset?
+    public private(set) var presetAmount: Double = 1
+    @ObservationIgnored private var presetBase: JSONValue?
+    public private(set) var userPresets: [DevelopPreset] = UserPresetStore.load()
+    /// Small renders of each preset on this photo; `thumbnailEpoch` changes when they are stale.
+    public private(set) var presetThumbnails: [String: CGImage] = [:]
+    public private(set) var thumbnailEpoch = 0
+    public private(set) var isAuto = false
+
     @ObservationIgnored private var renderTask: Task<Void, Never>?
     @ObservationIgnored private var pending: (JSONValue, CGSize, Bool)?
     @ObservationIgnored public var viewportPixels = CGSize(width: 2048, height: 2048)
@@ -69,7 +80,18 @@ public final class PhotoEditorModel {
         engine?.defaultSettings[path: path]?.doubleValue ?? 0
     }
 
+    /// Leaves preset browsing: the current settings become the base for the next preset.
+    private func endPresetSession() {
+        guard activePreset != nil || presetBase != nil else { thumbnailEpoch &+= 1; presetThumbnails = [:]; return }
+        activePreset = nil
+        presetBase = nil
+        presetAmount = 1
+        thumbnailEpoch &+= 1
+        presetThumbnails = [:]
+    }
+
     public func set(_ path: String, _ v: Double, label: String) {
+        endPresetSession()
         var s = settings
         s[path: path] = .number(v)
         if path.hasPrefix("wb.temp") || path.hasPrefix("wb.tint") { s[path: "wb.mode"] = .string("custom") }
@@ -78,6 +100,7 @@ public final class PhotoEditorModel {
     }
 
     public func setString(_ path: String, _ v: String, label: String) {
+        endPresetSession()
         var s = settings
         s[path: path] = .string(v)
         project.mutate(label) { $0.settings = s }
@@ -85,6 +108,7 @@ public final class PhotoEditorModel {
     }
 
     public func setBool(_ path: String, _ v: Bool, label: String) {
+        endPresetSession()
         var s = settings
         s[path: path] = .bool(v)
         project.mutate(label) { $0.settings = s }
@@ -110,19 +134,107 @@ public final class PhotoEditorModel {
 
     public func applyPreset(_ p: DevelopPreset) {
         guard let d = engine?.defaultSettings else { return }
-        let s = p.apply(to: settings, defaults: d)
+        let base = presetBase ?? settings
+        presetBase = base
+        activePreset = p
+        presetAmount = 1
+        let s = p.apply(to: base, defaults: d)
         project.mutate("Preset \(p.name)") { $0.settings = s }
+        requestRender(draft: false)
+    }
+
+    /// Preset amount 0…2 (Lightroom's 0…200 %), applied to the same base as the preset.
+    public func setPresetAmount(_ a: Double) {
+        guard let p = activePreset, let base = presetBase, let d = engine?.defaultSettings else { return }
+        presetAmount = a
+        let s = p.apply(to: base, defaults: d, amount: a)
+        project.mutate("Intensità preset") { $0.settings = s }
+        requestRender(draft: dragging)
+    }
+
+    /// Thumbnail of `p` on this photo (draft render, cached until the photo's settings change).
+    public func thumbnail(for p: DevelopPreset) async {
+        guard presetThumbnails[p.id] == nil, let e = engine else { return }
+        let epoch = thumbnailEpoch
+        let s = p.apply(to: presetBase ?? settings, defaults: e.defaultSettings)
+        guard let img = try? await e.render(s, maxSize: CGSize(width: 220, height: 220), draft: true), epoch == thumbnailEpoch else { return }
+        presetThumbnails[p.id] = img
+    }
+
+    public func saveUserPreset(name: String) {
+        let n = name.trimmingCharacters(in: .whitespaces)
+        guard !n.isEmpty else { return }
+        do {
+            try UserPresetStore.save(name: n, settings: settings)
+            userPresets = UserPresetStore.load()
+        } catch {
+            self.error = "Preset non salvato: \(error.localizedDescription)"
+        }
+    }
+
+    public func deleteUserPreset(_ p: DevelopPreset) {
+        UserPresetStore.delete(name: p.name)
+        userPresets = UserPresetStore.load()
+    }
+
+    /// Lightroom-style "Auto": the engine's automatic tone (and B&W mix in B&W) for this photo.
+    public func autoTone() async {
+        guard let e = engine, !isAuto else { return }
+        isAuto = true
+        defer { isAuto = false }
+        do {
+            let auto = try await e.autoSettings(settings)
+            endPresetSession()
+            var s = settings
+            let bw = (s[path: "treatment"]?.stringValue ?? "color") == "bw"
+            for group in bw ? ["light", "color", "bw_mix"] : ["light", "color"] {
+                guard case .object(let values)? = auto[path: group] else { continue }
+                for (k, v) in values { s[path: "\(group).\(k)"] = v }
+            }
+            project.mutate("Auto") { $0.settings = s }
+            requestRender(draft: false)
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    /// Point curve of a channel (`curve.master`, `curve.red`…) in 0…1; identity when empty.
+    public func curvePoints(_ path: String) -> [CGPoint] {
+        guard case .array(let a)? = settings[path: path] else { return [] }
+        return a.compactMap { p in
+            guard let x = p["x"]?.doubleValue, let y = p["y"]?.doubleValue else { return nil }
+            return CGPoint(x: x, y: y)
+        }
+    }
+
+    public func setCurve(_ path: String, _ points: [CGPoint]) {
+        endPresetSession()
+        var s = settings
+        let sorted = points.sorted { $0.x < $1.x }
+        s[path: path] = .array(sorted.map { .object(["x": .number(Double($0.x)), "y": .number(Double($0.y))]) })
+        project.mutate("Curva") { $0.settings = s }
+        requestRender(draft: dragging)
+    }
+
+    /// Back to the engine defaults for the given paths ("reset section").
+    public func reset(_ paths: [String], label: String) {
+        guard let d = engine?.defaultSettings else { return }
+        endPresetSession()
+        var s = settings
+        for p in paths { if let v = d[path: p] { s[path: p] = v } }
+        project.mutate(label) { $0.settings = s }
         requestRender(draft: false)
     }
 
     public func resetAll() {
         guard let d = engine?.defaultSettings else { return }
+        endPresetSession()
         project.mutate("Ripristina") { $0.settings = d }
         requestRender(draft: false)
     }
 
-    public func undo() { project.undo(); requestRender(draft: false) }
-    public func redo() { project.redo(); requestRender(draft: false) }
+    public func undo() { endPresetSession(); project.undo(); requestRender(draft: false) }
+    public func redo() { endPresetSession(); project.redo(); requestRender(draft: false) }
 
     // MARK: rendering
 

@@ -34,6 +34,10 @@ char *sc_photo_default_settings_json(const ScPhoto *photo);
 ScImage *sc_photo_render(ScPhoto *photo, const char *settings_json, uint32_t max_w, uint32_t max_h, bool draft, char **err);
 void sc_image_free(ScImage *image);
 
+/// Automatic tone ("Auto") for the photo under settings_json: JSON {"light":{...},"color":{...},"bw_mix":{...}}
+/// with develop-settings paths. Free with sc_string_free; null with *err set on failure.
+char *sc_photo_auto_json(ScPhoto *photo, const char *settings_json, char **err);
+
 /// Exports the full-resolution original. format: jpg|png|tif|webp|avif|dng. long_edge 0 = full size.
 /// Returns JSON {width, height, bytes} or NULL with *err set.
 char *sc_photo_export(ScPhoto *photo, const char *settings_json, const char *out_path, const char *format,

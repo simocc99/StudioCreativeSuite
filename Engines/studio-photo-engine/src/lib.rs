@@ -183,6 +183,29 @@ pub extern "C" fn sc_photo_render(
     })
 }
 
+/// Lightroom-style "Auto": the engine's automatic tone settings for this photo under
+/// `settings_json` (white balance and process are taken into account), plus the automatic
+/// B&W mix. Returns JSON `{"light":{…},"color":{…},"bw_mix":{…}}` (develop-settings paths).
+#[unsafe(no_mangle)]
+pub extern "C" fn sc_photo_auto_json(p: *mut ScPhoto, settings_json: *const c_char, err: *mut *mut c_char) -> *mut c_char {
+    guarded(err, std::ptr::null_mut(), || {
+        let p = unsafe { p.as_ref() }.ok_or("null photo")?;
+        let s = parse_settings(&cstr(settings_json)?)?;
+        let t = lightcraft_pipeline::auto::auto_tone(&p.preview, &p.info, &s);
+        let bw = lightcraft_pipeline::auto::auto_bw_mix(&p.preview, &p.info, &s);
+        let names = ["red", "orange", "yellow", "green", "aqua", "blue", "purple", "magenta"];
+        let bw_mix: serde_json::Map<String, serde_json::Value> =
+            names.iter().zip(bw.iter()).map(|(n, v)| (n.to_string(), serde_json::json!(v))).collect();
+        let out = serde_json::json!({
+            "light": {"exposure": t.exposure, "contrast": t.contrast, "highlights": t.highlights,
+                      "shadows": t.shadows, "whites": t.whites, "blacks": t.blacks},
+            "color": {"vibrance": t.vibrance, "saturation": t.saturation},
+            "bw_mix": bw_mix,
+        });
+        Ok(out_string(out.to_string()))
+    })
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn sc_image_free(img: *mut ScImage) {
     if img.is_null() {
