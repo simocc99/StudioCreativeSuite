@@ -35,6 +35,8 @@ struct RootView: View {
     @MainActor
     init(state: AppState? = nil) {
         _state = State(initialValue: state ?? AppState())
+        // opened straight into an editor (demo scenes): no sidebar, as when navigating there
+        _columns = State(initialValue: (state?.path.isEmpty ?? true) ? .all : .detailOnly)
     }
 
     var body: some View {

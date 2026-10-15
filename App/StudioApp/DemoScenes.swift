@@ -96,12 +96,13 @@ enum DemoScene {
     private static func makeClip(in dir: URL) async -> URL? {
         let clip = dir.appendingPathComponent("Clip.mp4")
         do {
-            try await FrameVideoWriter.write(to: clip, width: 1920, height: 1080, fps: 30, frameCount: 150) { i, ctx in
-                let t = Double(i) / 150
+            if FileManager.default.fileExists(atPath: clip.path) { return clip }
+            try await FrameVideoWriter.write(to: clip, width: 1280, height: 720, fps: 30, frameCount: 90) { i, ctx in
+                let t = Double(i) / 90
                 ctx.setFillColor(CGColor(srgbRed: 0.1 + 0.3 * t, green: 0.12, blue: 0.3, alpha: 1))
-                ctx.fill(CGRect(x: 0, y: 0, width: 1920, height: 1080))
+                ctx.fill(CGRect(x: 0, y: 0, width: 1280, height: 720))
                 ctx.setFillColor(CGColor(srgbRed: 0.55, green: 0.51, blue: 0.94, alpha: 1))
-                ctx.fillEllipse(in: CGRect(x: 200 + t * 1300, y: 390, width: 300, height: 300))
+                ctx.fillEllipse(in: CGRect(x: 130 + t * 870, y: 260, width: 200, height: 200))
             }
             return clip
         } catch { return nil }

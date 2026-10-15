@@ -33,6 +33,14 @@ xcrun simctl boot "$UDID" 2>/dev/null || true
 xcrun simctl bootstatus "$UDID" -b
 xcrun simctl ui "$UDID" appearance dark || true
 xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 --wifiBars 3 || true
+# landscape, as the editors are used: rotate through Simulator's Device menu (the app
+# cannot force orientation on iPadOS 26+); if UI scripting is not allowed, stay portrait
+open -a Simulator --args -CurrentDeviceUDID "$UDID" || true
+sleep 8
+osascript -e 'tell application "Simulator" to activate' -e 'delay 1' \
+  -e 'tell application "System Events" to tell process "Simulator" to click menu item "Rotate Left" of menu "Device" of menu bar 1' \
+  && echo "rotated to landscape" || echo "::warning::could not rotate the simulator; screenshots stay portrait"
+sleep 3
 xcrun simctl uninstall "$UDID" "$BID" 2>/dev/null || true
 xcrun simctl install "$UDID" "$APP"
 
@@ -40,7 +48,7 @@ rm -rf "$OUT"
 mkdir -p "$OUT"
 for s in "${SCENES[@]}"; do
   xcrun simctl launch --terminate-running-process "$UDID" "$BID" -StudioScene "$s" >/dev/null
-  sleep "$WAIT"
+  case "$s" in video|audio|photo) sleep $((WAIT * 2)) ;; *) sleep "$WAIT" ;; esac
   xcrun simctl io "$UDID" screenshot "$OUT/$s.png" >/dev/null
   echo "captured $s"
 done
